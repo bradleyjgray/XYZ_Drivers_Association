@@ -15,7 +15,8 @@
     <center>
         <h1>XYZ Drivers Association</h1>
         <h2> Please enter your registration details</h2>
-
+ </center>
+   
         <div class="container">
             <p>
             <label><b>Username</b></label>
@@ -34,7 +35,7 @@
             <input type="checkbox" checked="checked"> Remember me
             </p>
         </div>
-    </center>
+   
 
 </body>
 </html>
