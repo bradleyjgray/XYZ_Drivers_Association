@@ -4,9 +4,17 @@
         <servlet-name>test</servlet-name>
         <servlet-class>com.web.test</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Jdbc</servlet-name>
+        <servlet-class>com.model.Jdbc</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>test</servlet-name>
         <url-pattern>/test</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Jdbc</servlet-name>
+        <url-pattern>/Jdbc</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
