@@ -45,59 +45,69 @@ public class JDBC1 {
         jdbc.connect(connection);
 
     }
-    
-    public void connect(Connection con){
+
+    public void connect(Connection con) {
         connection = con;
     }
-    
-    public boolean usrExists(String usr){
+
+    public boolean usrExists(String usr) {
         boolean bool = false;
-        
-        try{
+
+        try {
             select("Select user: " + usr);
-           if (result.next()){
-               System.out.println("EXISTS");
-               bool = true;
-           }
-           else {
-               System.out.println("NON-EXISTENT");
-               bool = false;
-           }
-        }
-        catch (SQLException e){
-            System.out.println("err"+e);
+            if (result.next()) {
+                System.out.println("EXISTS");
+                bool = true;
+            } else {
+                System.out.println("NON-EXISTENT");
+                bool = false;
+            }
+        } catch (SQLException e) {
+            System.out.println("err" + e);
         }
         return bool;
     }
-    
-    private void select (String dbQuery){
-        
-        try{
+
+    private void select(String dbQuery) {
+
+        try {
             statement = connection.createStatement();
             result = statement.executeQuery(dbQuery);
-        }
-        catch (SQLException e) {
-            System.out.println("err"+e);
+        } catch (SQLException e) {
+            System.out.println("err" + e);
         }
     }
-    
-    public void insert (String[] str){
+
+    public void insert(String[] str) {
         PreparedStatement pStatement = null;
-        
-        try{
+
+        try {
             pStatement = connection.prepareStatement("Insert USER VALUES ::", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(0, str[0]);
             pStatement.setString(1, str[1]);
             pStatement.executeUpdate();
+            
+            pStatement.close();
+            System.out.println("Line added.");
+        } catch (SQLException e) {
+            System.out.println("err" + e);
         }
-        catch (SQLException e){
-            System.out.println("err"+e);
-        }
-        
     }
-    
-    public void updatePwd (String[] str){
+
+    public void updatePwd(String[] str) {
+        PreparedStatement pStatement = null;
         
+        try {
+            pStatement = connection.prepareStatement("Insert USER VALUES ::", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(0, str[0]);
+            pStatement.setString(1, str[1]);
+            pStatement.executeUpdate();
+            
+            pStatement.close();
+            System.out.println("Line added.");
+        } catch (SQLException e) {
+            System.out.println("err" + e);
+        }
     }
 
 }
