@@ -78,8 +78,22 @@ public class JDBC1 {
         }
         catch (SQLException e) {
             System.out.println("err"+e);
-            
         }
+    }
+    
+    public void insert (String[] str){
+        PreparedStatement pStatement = null;
+        
+        try{
+            pStatement = connection.prepareStatement("Insert USER VALUES ::", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(0, str[0]);
+            pStatement.setString(1, str[1]);
+            pStatement.executeUpdate();
+        }
+        catch (SQLException e){
+            System.out.println("err"+e);
+        }
+        
     }
 
 }
