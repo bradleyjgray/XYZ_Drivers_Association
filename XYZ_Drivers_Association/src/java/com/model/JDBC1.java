@@ -45,59 +45,88 @@ public class JDBC1 {
         jdbc.connect(connection);
 
     }
-    
-    public void connect(Connection con){
+
+    public void connect(Connection con) {
         connection = con;
     }
-    
-    public boolean usrExists(String usr){
+
+    public boolean usrExists(String usr) {
         boolean bool = false;
-        
-        try{
-            select("Select user: " + usr);
-           if (result.next()){
-               System.out.println("EXISTS");
-               bool = true;
-           }
-           else {
-               System.out.println("NON-EXISTENT");
-               bool = false;
-           }
-        }
-        catch (SQLException e){
-            System.out.println("err"+e);
+
+        try {
+            select("select username from users where username='" + usr);
+            if (result.next()) {
+                System.out.println("EXISTS");
+                bool = true;
+            } else {
+                System.out.println("NON-EXISTENT");
+                bool = false;
+            }
+        } catch (SQLException e) {
+            System.out.println("err" + e);
         }
         return bool;
     }
-    
-    private void select (String dbQuery){
-        
-        try{
+
+    private void select(String dbQuery) {
+
+        try {
             statement = connection.createStatement();
             result = statement.executeQuery(dbQuery);
-        }
-        catch (SQLException e) {
-            System.out.println("err"+e);
+        } catch (SQLException e) {
+            System.out.println("err" + e);
         }
     }
-    
-    public void insert (String[] str){
+
+    public void insert(String[] str) {
         PreparedStatement pStatement = null;
-        
-        try{
-            pStatement = connection.prepareStatement("Insert USER VALUES ::", PreparedStatement.RETURN_GENERATED_KEYS);
+
+        try {
+            pStatement = connection.prepareStatement("INSERT INTO Users VALUES (?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(0, str[0]);
             pStatement.setString(1, str[1]);
             pStatement.executeUpdate();
+            
+            pStatement.close();
+            System.out.println("Line added.");
+        } catch (SQLException e) {
+            System.out.println("err" + e);
         }
-        catch (SQLException e){
-            System.out.println("err"+e);
-        }
-        
-    }
-    
-    public void updatePwd (String[] str){
-        
     }
 
+    public void updatePwd(String[] str) {
+        PreparedStatement pStatement = null;
+        
+        try {
+            pStatement = connection.prepareStatement("Update Users Set password=? where username=?", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(0, str[0]);
+            pStatement.setString(1, str[1]);
+            pStatement.executeUpdate();
+            
+            pStatement.close();
+            System.out.println("Line added.");
+        } catch (SQLException e) {
+            System.out.println("err" + e);
+        }
+    }
+    public void delete(String user){
+        String del = "DELETE FROM Users " + "WHERE username = '"+user.trim()+"'";
+        
+        try{
+            statement = connection.createStatement();
+            statement.executeUpdate(del);
+        } catch (SQLException e){
+            System.out.println("DEL FAILED: "+e);
+        }
+    }
+    
+    public void closeAll(){
+        try{
+            result.close();
+            statement.close();
+        } catch(SQLException e){
+            System.out.println("CLOSE FAILED:: "+e);
+        }   
+    }
+    
 }

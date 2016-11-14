@@ -18,16 +18,22 @@
 
         <div class="container">
             <p>
-            <label><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" name="uname" required>
+                <label><b>Username</b></label>
+                <input type="text" placeholder="Enter Username" name="uname" required>
             </p>
             <p>
-            <label><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="psw" required>
+                <label><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="psw" required>
             </p>
             <p>
-            <button type="submit">Login</button>
-            <input type="checkbox" checked="checked"> Remember me
+                <button type="submit">Login</button>
+                <input type="checkbox" checked="checked"> Remember me
+            </p>
+            <p>
+            <p>Don't have an account? Register Below.</p>
+            <form action="register.jsp">
+                <input type="submit" value="Register" />
+            </form>
             </p>
         </div>
     </center>
