@@ -19,11 +19,6 @@
             <input type="submit" value="Login" />
         </form>
     </p>
-    <p>
-    <form action="register.jsp">
-        <input type="submit" value="Register" />
-    </form>
-</p>
 </center>
 </body>
 </html>
