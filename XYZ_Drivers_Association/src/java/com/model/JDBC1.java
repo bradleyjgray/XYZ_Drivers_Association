@@ -54,7 +54,7 @@ public class JDBC1 {
         boolean bool = false;
 
         try {
-            select("Select user: " + usr);
+            select("select username from users where username='" + usr);
             if (result.next()) {
                 System.out.println("EXISTS");
                 bool = true;
@@ -82,7 +82,7 @@ public class JDBC1 {
         PreparedStatement pStatement = null;
 
         try {
-            pStatement = connection.prepareStatement("Insert USER VALUES ::", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement = connection.prepareStatement("INSERT INTO Users VALUES (?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(0, str[0]);
             pStatement.setString(1, str[1]);
             pStatement.executeUpdate();
@@ -98,7 +98,7 @@ public class JDBC1 {
         PreparedStatement pStatement = null;
         
         try {
-            pStatement = connection.prepareStatement("Insert USER VALUES ::", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement = connection.prepareStatement("Update Users Set password=? where username=?", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(0, str[0]);
             pStatement.setString(1, str[1]);
             pStatement.executeUpdate();
@@ -109,5 +109,24 @@ public class JDBC1 {
             System.out.println("err" + e);
         }
     }
-
+    public void delete(String user){
+        String del = "DELETE FROM Users " + "WHERE username = '"+user.trim()+"'";
+        
+        try{
+            statement = connection.createStatement();
+            statement.executeUpdate(del);
+        } catch (SQLException e){
+            System.out.println("DEL FAILED: "+e);
+        }
+    }
+    
+    public void closeAll(){
+        try{
+            result.close();
+            statement.close();
+        } catch(SQLException e){
+            System.out.println("CLOSE FAILED:: "+e);
+        }   
+    }
+    
 }
