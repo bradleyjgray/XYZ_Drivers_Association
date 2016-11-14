@@ -12,6 +12,18 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
-    </body>
+    <center>
+        <h1>XYZ Drivers Association</h1>
+        <p>
+        <form action="login.jsp">
+            <input type="submit" value="Login" />
+        </form>
+    </p>
+    <p>
+    <form action="register.jsp">
+        <input type="submit" value="Register" />
+    </form>
+</p>
+</center>
+</body>
 </html>
