@@ -5,6 +5,7 @@
  */
 package com.model;
 
+import static java.lang.Math.random;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -13,6 +14,10 @@ import java.util.logging.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
 
 /**
  *
@@ -26,6 +31,7 @@ public class JDBC1 {
 
     /**
      * @param args the command line arguments
+     * @throws java.sql.SQLException
      */
     public static void main(String[] args) throws SQLException {
 
@@ -86,7 +92,7 @@ public class JDBC1 {
             pStatement.setString(0, str[0]);
             pStatement.setString(1, str[1]);
             pStatement.executeUpdate();
-            
+
             pStatement.close();
             System.out.println("Line added.");
         } catch (SQLException e) {
@@ -96,37 +102,70 @@ public class JDBC1 {
 
     public void updatePwd(String[] str) {
         PreparedStatement pStatement = null;
-        
+
         try {
             pStatement = connection.prepareStatement("Update Users Set password=? where username=?", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(0, str[0]);
             pStatement.setString(1, str[1]);
             pStatement.executeUpdate();
-            
+
             pStatement.close();
             System.out.println("Line added.");
         } catch (SQLException e) {
             System.out.println("err" + e);
         }
     }
-    public void delete(String user){
-        String del = "DELETE FROM Users " + "WHERE username = '"+user.trim()+"'";
-        
-        try{
+
+    public void delete(String user) {
+        String del = "DELETE FROM Users " + "WHERE username = '" + user.trim() + "'";
+
+        try {
             statement = connection.createStatement();
             statement.executeUpdate(del);
-        } catch (SQLException e){
-            System.out.println("DEL FAILED: "+e);
+        } catch (SQLException e) {
+            System.out.println("DEL FAILED: " + e);
         }
     }
-    
-    public void closeAll(){
-        try{
+
+    public void closeAll() {
+        try {
             result.close();
             statement.close();
-        } catch(SQLException e){
-            System.out.println("CLOSE FAILED:: "+e);
-        }   
+        } catch (SQLException e) {
+            System.out.println("CLOSE FAILED:: " + e);
+        }
     }
-    
+
+    public String genUsr(String firstName, String lastName) {
+
+        String usrName = null;
+
+        String[] fName = firstName.split("");
+
+        usrName = fName[0] + lastName;
+
+        while (usrExists(usrName) == true) {
+            Random random = new Random();
+            int rand = random.nextInt(100 - 0) + 0;
+            String randNum = Integer.toString(rand);
+            usrName = usrName + randNum;
+        }
+
+        System.out.println("Username is: " + usrName);
+        return usrName;
+    }
+
+    public String genPass(String dob) {
+        String pass = null;
+        
+        Date date = new Date();
+        
+        try{
+            Date dobDate = new SimpleDateFormat("dd/mm/yy").parse(dob);
+        } catch (ParseException e){
+            
+        }
+        return pass;
+    }
+
 }
