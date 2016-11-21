@@ -125,14 +125,6 @@ public class JDBC1 {
         }
         return sb.toString(); 
     }
-    
-//    public String retrieveData(String query){
-//        String retrieve="";
-//        
-//        select(query);
-//        
-//        return null;
-//    }
 
     public void insert(String[] str) {
         PreparedStatement pStatement = null;
@@ -148,7 +140,30 @@ public class JDBC1 {
         } catch (SQLException e) {
             System.out.println("err" + e);
         }
+    }    
+    
+    public boolean addUsr(String[] name, String pass){
+       
+        PreparedStatement pStatement = null;
+        String usr = genUsr(name);
+        String pswd = genPass(pass);
+        String status = "APPLIED";
+       
+        try{
+             pStatement = connection.prepareStatement("INSERT INTO Users VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+             pStatement.setString(0, usr);
+             pStatement.setString(1, pswd);
+             pStatement.setString(2, status);
+             
+             pStatement.close();
+             System.out.println("USR ADDED!");
+         } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
     }
+    
 
     public void updatePwd(String[] str) {
         PreparedStatement pStatement = null;
@@ -186,13 +201,13 @@ public class JDBC1 {
         }
     }
 
-    public String genUsr(String firstName, String lastName) {
+    public String genUsr(String[] name) {
 
         String usrName = null;
 
-        String[] fName = firstName.split("");
+        String[] fName = name[0].split("");
 
-        usrName = fName[0] + lastName;
+        usrName = fName[0] + name[1];
 
         while (usrExists(usrName) == true) {
             Random random = new Random();
@@ -200,7 +215,6 @@ public class JDBC1 {
             String randNum = Integer.toString(rand);
             usrName = usrName + randNum;
         }
-
         System.out.println("Username is: " + usrName);
         return usrName;
     }
