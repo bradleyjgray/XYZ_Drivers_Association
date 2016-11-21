@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
@@ -83,6 +84,55 @@ public class JDBC1 {
             System.out.println("err" + e);
         }
     }
+    
+    private ArrayList resultList() throws SQLException{
+        ArrayList resultList = new ArrayList<>();
+        
+        if (!resultList.isEmpty()){
+            resultList.clear();
+        }
+        //get column count from result set data
+        int columns = result.getMetaData().getColumnCount();
+        while (result.next()){
+            String[] entry = new String[columns];
+            for (int i = 0; i < columns; i++) {
+                entry[i] = result.getString(i);
+            }
+            resultList.add(entry);
+        }
+        return resultList; 
+    }
+    
+    private String resultTable(ArrayList entries){
+        StringBuilder sb = new StringBuilder();
+        String[] row;
+        
+        if (!entries.isEmpty()){
+            sb.append("< table border=\"6\">");
+            for (Object e : entries) {
+                sb.append("<tr>");
+                row = (String[]) e;
+                    for (String entry : row){
+                        sb.append("<td>");
+                        sb.append(entry);
+                        sb.append("</td>");
+                    }
+                sb.append("</tr>");
+            }
+            sb.append("</table>");
+        } else {
+            System.out.println("ArrayList :: ENTRIES :: is EMPTY!");   
+        }
+        return sb.toString(); 
+    }
+    
+//    public String retrieveData(String query){
+//        String retrieve="";
+//        
+//        select(query);
+//        
+//        return null;
+//    }
 
     public void insert(String[] str) {
         PreparedStatement pStatement = null;
@@ -161,9 +211,10 @@ public class JDBC1 {
         Date date = new Date();
         
         try{
-            Date dobDate = new SimpleDateFormat("dd/mm/yy").parse(dob);
+            Date dobDate = new SimpleDateFormat("dd/mm/yy").parse(dob);        
+            pass = dobDate.toString();
         } catch (ParseException e){
-            
+            System.out.println("Incorrect Date Format!!");
         }
         return pass;
     }
