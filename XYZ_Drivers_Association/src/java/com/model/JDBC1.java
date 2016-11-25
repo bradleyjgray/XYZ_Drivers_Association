@@ -307,4 +307,38 @@ public class JDBC1 {
         }
 
     }
+    
+    public void makePayment(String memId, float amount, String payType){
+        
+        //paytype: EITHER BAL (Balance) or MEM (Membership)
+        
+        PreparedStatement pStatement = null;
+        
+        Date today = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        
+        String datePayment = null;
+        
+        try {
+            datePayment = dateFormat.format(today);
+            today = dateFormat.parse(datePayment);
+        } catch (ParseException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try{
+            pStatement = connection.prepareStatement("INSERT INTO payments VALUES (?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, memId);
+            pStatement.setString(2, payType);
+            pStatement.setFloat(3, amount);
+            pStatement.setDate(4, (java.sql.Date) today);
+            
+            pStatement.close();
+            System.out.println("1 line added.");
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+
+    }
 }
