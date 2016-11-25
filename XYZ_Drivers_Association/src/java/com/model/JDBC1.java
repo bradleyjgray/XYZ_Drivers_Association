@@ -399,7 +399,7 @@ public class JDBC1 {
 
         if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
             try {
-                pStatement = connection.prepareStatement("Update Claims Set status=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                pStatement = connection.prepareStatement("Update Claims Set status=? where mem_id=?", PreparedStatement.RETURN_GENERATED_KEYS);
                 pStatement.setString(0, response);
                 pStatement.setString(1, claimId);
 
