@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class JDBC1 {
     Connection connection = null;
     ResultSet result = null;
     Statement statement = null;
+
+    String status = "APPLIED";
 
     /**
      * @param args the command line arguments
@@ -84,46 +87,46 @@ public class JDBC1 {
             System.out.println("err" + e);
         }
     }
-    
-    private ArrayList resultList() throws SQLException{
+
+    private ArrayList resultList() throws SQLException {
         ArrayList resultList = new ArrayList<>();
-        
-        if (!resultList.isEmpty()){
+
+        if (!resultList.isEmpty()) {
             resultList.clear();
         }
         //get column count from result set data
         int columns = result.getMetaData().getColumnCount();
-        while (result.next()){
+        while (result.next()) {
             String[] entry = new String[columns];
             for (int i = 0; i < columns; i++) {
                 entry[i] = result.getString(i);
             }
             resultList.add(entry);
         }
-        return resultList; 
+        return resultList;
     }
-    
-    private String resultTable(ArrayList entries){
+
+    private String resultTable(ArrayList entries) {
         StringBuilder sb = new StringBuilder();
         String[] row;
-        
-        if (!entries.isEmpty()){
+
+        if (!entries.isEmpty()) {
             sb.append("< table border=\"6\">");
             for (Object e : entries) {
                 sb.append("<tr>");
                 row = (String[]) e;
-                    for (String entry : row){
-                        sb.append("<td>");
-                        sb.append(entry);
-                        sb.append("</td>");
-                    }
+                for (String entry : row) {
+                    sb.append("<td>");
+                    sb.append(entry);
+                    sb.append("</td>");
+                }
                 sb.append("</tr>");
             }
             sb.append("</table>");
         } else {
-            System.out.println("ArrayList :: ENTRIES :: is EMPTY!");   
+            System.out.println("ArrayList :: ENTRIES :: is EMPTY!");
         }
-        return sb.toString(); 
+        return sb.toString();
     }
 
     public void insert(String[] str) {
@@ -140,30 +143,29 @@ public class JDBC1 {
         } catch (SQLException e) {
             System.out.println("err" + e);
         }
-    }    
-    
-    public boolean addUsr(String[] name, String pass){
-       
+    }
+
+    public boolean addUsr(String[] name, String pass) {
+
         PreparedStatement pStatement = null;
         String usr = genUsr(name);
         String pswd = genPass(pass);
         String status = "APPLIED";
-       
-        try{
-             pStatement = connection.prepareStatement("INSERT INTO Users VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-             pStatement.setString(0, usr);
-             pStatement.setString(1, pswd);
-             pStatement.setString(2, status);
-             
-             pStatement.close();
-             System.out.println("USR ADDED!");
-         } catch (SQLException ex) {
+
+        try {
+            pStatement = connection.prepareStatement("INSERT INTO Users VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(0, usr);
+            pStatement.setString(1, pswd);
+            pStatement.setString(2, status);
+
+            pStatement.close();
+            System.out.println("USER ADDED!");
+        } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return false;
     }
-    
 
     public void updatePwd(String[] str) {
         PreparedStatement pStatement = null;
@@ -175,14 +177,14 @@ public class JDBC1 {
             pStatement.executeUpdate();
 
             pStatement.close();
-            System.out.println("Line added.");
+            System.out.println("Updated.");
         } catch (SQLException e) {
             System.out.println("err" + e);
         }
     }
 
     public void delete(String user) {
-        String del = "DELETE FROM Users " + "WHERE username = '" + user.trim() + "'";
+        String del = "DELETE FROM users " + "WHERE username = '" + user.trim() + "'";
 
         try {
             statement = connection.createStatement();
@@ -221,16 +223,71 @@ public class JDBC1 {
 
     public String genPass(String dob) {
         String pass = null;
-        
+
         Date date = new Date();
-        
-        try{
-            Date dobDate = new SimpleDateFormat("dd/mm/yy").parse(dob);        
+
+        try {
+            Date dobDate = new SimpleDateFormat("dd/mm/yy").parse(dob);
             pass = dobDate.toString();
-        } catch (ParseException e){
+        } catch (ParseException e) {
             System.out.println("Incorrect Date Format!!");
         }
         return pass;
     }
 
+    public void createMember(String id, String name, String addr, String dob, String status, String balance) throws SQLException {
+
+        String query = "SELECT * from users";
+        PreparedStatement pStatement = null;
+     
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date dor = new Date();
+        
+        try{
+            pStatement = connection.prepareStatement("INSERT INTO Members VALUES (?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(0, id);
+            pStatement.setString(1, name);
+            pStatement.setString(2, addr);
+            pStatement.setString(3, dob);
+            pStatement.setString(4, dateFormat.format(dor));
+            pStatement.setString(5, status);
+            pStatement.setString(6, balance);
+            
+            pStatement.close();
+            System.out.println("1 line added.");
+        }
+        catch (SQLException e){
+            System.out.println("FAILED to INSERT MEMBER!"  + e);
+        }
+
+    }
+
+    public void appliedToMember(String id_user) throws SQLException {
+
+        String query = "SELECT * from users";
+        PreparedStatement pStatement = null;
+       
+        select(query);
+        
+        while (result.next()) {
+            String id = result.getString("id");
+            String pswd = result.getString("password");
+            String status = result.getString("status");
+
+            if (id_user.equals(id)) {
+                try {
+                    pStatement = connection.prepareStatement("Update users Set status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                    pStatement.setString(0, "MEMBER");
+                    pStatement.setString(1, id_user);
+                    
+                    pStatement.close();
+                    System.out.println("1 line updated.");
+                } catch (SQLException e) {
+                    System.out.println("FAILED to UPDATE MEMBER STATUS! " + e);
+                }
+                break;
+            }
+        }
+
+    }
 }
