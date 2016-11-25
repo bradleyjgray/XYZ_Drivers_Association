@@ -174,7 +174,7 @@ public class JDBC1 {
         PreparedStatement pStatement = null;
 
         try {
-            pStatement = connection.prepareStatement("Update Users Set password=? where username=?", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement = connection.prepareStatement("Update Users Set password=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(0, str[0]);
             pStatement.setString(1, str[1]);
             pStatement.executeUpdate();
@@ -443,5 +443,16 @@ public class JDBC1 {
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public ArrayList listMemberClaims(String memId) throws SQLException {
+
+        String query = "SELECT * from Claims where mem_id=" + memId;
+
+        select(query);
+        
+        ArrayList memberClaims = new ArrayList<>(resultList());
+        
+        return memberClaims;
     }
 }
