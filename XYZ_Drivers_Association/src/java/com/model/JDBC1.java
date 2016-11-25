@@ -235,29 +235,40 @@ public class JDBC1 {
         return pass;
     }
 
-    public void createMember(String id, String name, String addr, String dob, String status, String balance) throws SQLException {
+    public void createMember(String id, String name, String addr, String dob_String, String status) throws SQLException {
 
-        String query = "SELECT * from users";
         PreparedStatement pStatement = null;
-     
+
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date dor = new Date();
-        
-        try{
+        Date dob = new Date();
+
+        String dateReg;
+
+        try {
+            dateReg = dateFormat.format(dor);
+            dor = dateFormat.parse(dateReg);
+            dob = dateFormat.parse(dob_String);
+        } catch (ParseException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        float balance = 0.0f;
+
+        try {
             pStatement = connection.prepareStatement("INSERT INTO Members VALUES (?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(0, id);
             pStatement.setString(1, name);
             pStatement.setString(2, addr);
-            pStatement.setString(3, dob);
-            pStatement.setString(4, dateFormat.format(dor));
+            pStatement.setDate(3, (java.sql.Date) dob);
+            pStatement.setDate(4, (java.sql.Date) dor);
             pStatement.setString(5, status);
-            pStatement.setString(6, balance);
-            
+            pStatement.setFloat(6, balance);
+
             pStatement.close();
             System.out.println("1 line added.");
-        }
-        catch (SQLException e){
-            System.out.println("FAILED to INSERT MEMBER!"  + e);
+        } catch (SQLException e) {
+            System.out.println("FAILED to INSERT MEMBER!" + e);
         }
 
     }
@@ -266,9 +277,9 @@ public class JDBC1 {
 
         String query = "SELECT * from users";
         PreparedStatement pStatement = null;
-       
+
         select(query);
-        
+
         while (result.next()) {
             String id = result.getString("id");
             String pswd = result.getString("password");
@@ -279,9 +290,16 @@ public class JDBC1 {
                     pStatement = connection.prepareStatement("Update users Set status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
                     pStatement.setString(0, "MEMBER");
                     pStatement.setString(1, id_user);
-                    
+
                     pStatement.close();
-                    System.out.println("1 line updated.");
+
+                    pStatement = connection.prepareStatement("Update Members Set status=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                    pStatement.setString(0, "MEMBER");
+                    pStatement.setString(1, id_user);
+
+                    pStatement.close();
+
+                    System.out.println("2 lines updated.");
                 } catch (SQLException e) {
                     System.out.println("FAILED to UPDATE MEMBER STATUS! " + e);
                 }
