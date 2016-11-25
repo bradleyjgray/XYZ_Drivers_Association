@@ -244,6 +244,7 @@ public class JDBC1 {
         Date dob = new Date();
 
         String dateReg;
+        float balance = 0.0f;
 
         try {
             dateReg = dateFormat.format(dor);
@@ -252,8 +253,6 @@ public class JDBC1 {
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        float balance = 0.0f;
 
         try {
             pStatement = connection.prepareStatement("INSERT INTO Members VALUES (?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
