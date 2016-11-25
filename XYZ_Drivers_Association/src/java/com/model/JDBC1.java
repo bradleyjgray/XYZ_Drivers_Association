@@ -450,9 +450,63 @@ public class JDBC1 {
         String query = "SELECT * from Claims where mem_id=" + memId;
 
         select(query);
-        
+
         ArrayList memberClaims = new ArrayList<>(resultList());
-        
+
         return memberClaims;
+    }
+
+    public float calcMembershipFee() {
+
+        String query = "SELECT * from Claims";
+        String memQuery = "Select * from Members";
+
+        float amount = 0.0f;
+        int memberCount = 0;
+
+        select(query);
+
+        //format todays date
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date today = new Date();
+
+        //get date one year ago
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -1);
+
+        //for date conversion/parsing
+        String todayDate = null;
+
+        try {
+            todayDate = dateFormat.format(today);
+            today = dateFormat.parse(todayDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+            while (result.next()) {
+                Date date = result.getDate("date");
+                if (date.after(calendar.getTime()) && date.before(today)) {
+                    amount += result.getFloat("amount");
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        select(memQuery);
+
+        try {
+            while (result.next()) {
+                memberCount++;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        membershipFee = (amount / memberCount);
+
+        return membershipFee;
     }
 }
