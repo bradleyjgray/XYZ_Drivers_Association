@@ -18,6 +18,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
@@ -349,17 +350,39 @@ public class JDBC1 {
 
     public int claimCount(String memId) {
 
+        //select from DB
         String query = "SELECT * from Claims";
         select(query);
+
+        //format todays date
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date today = new Date();
+
+        //get date one year ago
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -1);
+
+        //for date conversion/parsing
+        String todayDate = null;
+
         int claimCount = 0;
+
+        try {
+            todayDate = dateFormat.format(today);
+            today = dateFormat.parse(todayDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         try {
             while (result.next()) {
                 String memberId = result.getString("memID");
                 Date claimDate = result.getDate("date");
-
-                if (memId.equals(memberId)) {
-                    claimCount++;
+                //check if date is after 12 months ago and before today
+                if (claimDate.after(calendar.getTime()) && claimDate.before(today)) {
+                    if (memId.equals(memberId)) {
+                        claimCount++;
+                    }
                 }
             }
         } catch (SQLException ex) {
@@ -397,7 +420,7 @@ public class JDBC1 {
 
         String claimDate = null;
         String status = "PENDING";
-        
+
         PreparedStatement pStatement = null;
 
         try {
@@ -406,7 +429,7 @@ public class JDBC1 {
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         try {
             pStatement = connection.prepareStatement("INSERT INTO Claims VALUES (?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(1, memId);
@@ -414,7 +437,7 @@ public class JDBC1 {
             pStatement.setString(3, rationale);
             pStatement.setString(4, status);
             pStatement.setFloat(5, amount);
-            
+
             pStatement.close();
             System.out.println("1 line added.");
         } catch (SQLException ex) {
