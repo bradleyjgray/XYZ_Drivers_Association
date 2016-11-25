@@ -32,6 +32,8 @@ public class JDBC1 {
     Statement statement = null;
 
     String status = "APPLIED";
+    float membershipFee = 0.00f;
+    float balance = 0.00f;
 
     /**
      * @param args the command line arguments
@@ -234,6 +236,12 @@ public class JDBC1 {
         }
         return pass;
     }
+    
+    public float setMemberFee(float newFee){
+        membershipFee = newFee;
+        
+        return membershipFee;
+    }
 
     public void createMember(String id, String name, String addr, String dob_String, String status) throws SQLException {
 
@@ -244,7 +252,7 @@ public class JDBC1 {
         Date dob = new Date();
 
         String dateReg;
-        float balance = 0.0f;
+        balance+= membershipFee;
 
         try {
             dateReg = dateFormat.format(dor);
@@ -310,7 +318,7 @@ public class JDBC1 {
     
     public void makePayment(String memId, float amount, String payType){
         
-        //paytype: EITHER BAL (Balance) or MEM (Membership)
+        //paytype: EITHER BALANCE (Balance) or MEMBERSHIP (Membership)
         
         PreparedStatement pStatement = null;
         
@@ -338,7 +346,5 @@ public class JDBC1 {
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-
     }
 }
