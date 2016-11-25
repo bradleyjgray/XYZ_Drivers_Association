@@ -236,10 +236,10 @@ public class JDBC1 {
         }
         return pass;
     }
-    
-    public float setMemberFee(float newFee){
+
+    public float setMemberFee(float newFee) {
         membershipFee = newFee;
-        
+
         return membershipFee;
     }
 
@@ -252,7 +252,7 @@ public class JDBC1 {
         Date dob = new Date();
 
         String dateReg;
-        balance+= membershipFee;
+        balance += membershipFee;
 
         try {
             dateReg = dateFormat.format(dor);
@@ -315,31 +315,105 @@ public class JDBC1 {
         }
 
     }
-    
-    public void makePayment(String memId, float amount, String payType){
-        
+
+    public void makePayment(String memId, float amount, String payType) {
+
         //paytype: EITHER BALANCE (Balance) or MEMBERSHIP (Membership)
-        
         PreparedStatement pStatement = null;
-        
+
         Date today = new Date();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        
+
         String datePayment = null;
-        
+
         try {
             datePayment = dateFormat.format(today);
             today = dateFormat.parse(datePayment);
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        try{
+
+        try {
             pStatement = connection.prepareStatement("INSERT INTO payments VALUES (?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(1, memId);
             pStatement.setString(2, payType);
             pStatement.setFloat(3, amount);
             pStatement.setDate(4, (java.sql.Date) today);
+
+            pStatement.close();
+            System.out.println("1 line added.");
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public int claimCount(String memId) {
+
+        String query = "SELECT * from Claims";
+        select(query);
+        int claimCount = 0;
+
+        try {
+            while (result.next()) {
+                String memberId = result.getString("memID");
+                Date claimDate = result.getDate("date");
+
+                if (memId.equals(memberId)) {
+                    claimCount++;
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("RESULT SET EMPTY!");
+        }
+        return claimCount;
+    }
+
+    public void respondClaim(String claimId, String response) {
+
+        //CLAIMS MADE SET AS 'PENDING' STATUS.
+        PreparedStatement pStatement = null;
+
+        if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
+            try {
+                pStatement = connection.prepareStatement("Update Claims Set status=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                pStatement.setString(0, response);
+                pStatement.setString(1, claimId);
+
+                pStatement.close();
+                System.out.println("1 line updated.");
+            } catch (SQLException ex) {
+                Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
+        }
+    }
+
+    public void makeClaim(String memId, String rationale, float amount) {
+
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date today = new Date();
+
+        String claimDate = null;
+        String status = "PENDING";
+        
+        PreparedStatement pStatement = null;
+
+        try {
+            claimDate = dateFormat.format(today);
+            today = dateFormat.parse(claimDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try {
+            pStatement = connection.prepareStatement("INSERT INTO Claims VALUES (?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, memId);
+            pStatement.setDate(2, (java.sql.Date) today);
+            pStatement.setString(3, rationale);
+            pStatement.setString(4, status);
+            pStatement.setFloat(5, amount);
             
             pStatement.close();
             System.out.println("1 line added.");
