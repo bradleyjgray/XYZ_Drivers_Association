@@ -19,11 +19,11 @@
         <div class="container">
             <p>
                 <label><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="uname" required>
+                <input type="text" placeholder="Enter Username" name="username" required>
             </p>
             <p>
                 <label><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="psw" required>
+                <input type="password" placeholder="Enter Password" name="pswd" required>
             </p>
             <p>
                 <button type="submit">Login</button>
