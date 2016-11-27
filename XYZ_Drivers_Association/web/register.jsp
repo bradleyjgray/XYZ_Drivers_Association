@@ -1,9 +1,3 @@
-<%-- 
-    Document   : register
-    Created on : 31-Oct-2016, 14:10:19
-    Author     : Luke James
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
