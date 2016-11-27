@@ -1,9 +1,3 @@
-<%-- 
-    Document   : login
-    Created on : 31-Oct-2016, 14:09:57
-    Author     : Luke James
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -19,11 +13,11 @@
         <div class="container">
             <p>
                 <label><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="uname" required>
+                <input type="text" placeholder="Enter Username" name="username" required>
             </p>
             <p>
                 <label><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="psw" required>
+                <input type="password" placeholder="Enter Password" name="pswd" required>
             </p>
             <p>
                 <button type="submit">Login</button>

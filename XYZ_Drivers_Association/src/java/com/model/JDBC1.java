@@ -509,4 +509,28 @@ public class JDBC1 {
 
         return membershipFee;
     }
+
+    public String authLogin(String user, String pass) {
+
+        String query = "SELECT * from USERS where id=" + user;
+
+        String authKey = null;
+
+        try {
+            while (result.next()) {
+                String pswd = result.getString("password");
+                String status = result.getString("status");
+                if (pass.equals(pswd)) {
+                    authKey = status;
+                }
+                else {
+                    authKey = "failed!";
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return authKey;
+    }
 }

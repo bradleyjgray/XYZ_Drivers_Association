@@ -1,9 +1,3 @@
-<%-- 
-    Document   : index
-    Created on : 31-Oct-2016, 13:23:58
-    Author     : Luke James
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -18,7 +12,7 @@
         <form action="login.jsp">
             <input type="submit" value="Login" />
         </form>
-    </p>
+        </p>
 </center>
 </body>
 </html>
