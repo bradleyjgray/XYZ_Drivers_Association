@@ -59,19 +59,19 @@ public class RequestLogFilter implements Filter {
 
             this.context.log(req.getRemoteAddr() + " :: Request "
                     + "Paremeters:: " + paramName + ", " + paramValue);
-
-            Cookie[] cookies = req.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    this.context.log(req.getRemoteAddr() + 
-                            "::Cookie::{" + cookie.getName() + "," + 
-                            cookie.getValue() + "}");
-                }
-            }
-            //pass request along filter chain.
-            chain.doFilter(request, response);
-
         }
+
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                this.context.log(req.getRemoteAddr()
+                        + "::Cookie::{" + cookie.getName() + ","
+                        + cookie.getValue() + "}");
+            }
+        }
+        //pass request along filter chain.
+        chain.doFilter(request, response);
+
     }
 
     public void destroy() {
