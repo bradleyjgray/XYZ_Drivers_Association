@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
 
         JDBC1 jdbc = (JDBC1) session.getAttribute("dbbean");
         if (jdbc == null) {
-            //request.getRequestDispatcher("/WEB-INF/conDBErr.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/conDBErr.jsp").forward(request, response);
         } else {
             
             String username = null, password = null;
