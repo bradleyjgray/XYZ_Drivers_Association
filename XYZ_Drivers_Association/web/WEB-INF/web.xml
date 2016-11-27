@@ -5,7 +5,7 @@
         <param-value>usedb</param-value>
     </context-param>
     <filter>
-        <filter-name>LoginFilter</filter-name>
+        <filter-name>RequestLogFilter</filter-name>
         <filter-class>com.filters.RequestLogFilter</filter-class>
     </filter>
     <filter>
@@ -17,17 +17,10 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>LoginFilter</filter-name>
+        <filter-name>RequestLogFilter</filter-name>
         <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
-    <servlet>
-        <servlet-name>test</servlet-name>
-        <servlet-class>com.web.test</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>Jdbc</servlet-name>
-        <servlet-class>com.model.Jdbc</servlet-class>
-    </servlet>
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>com.pages.LoginServlet</servlet-class>
@@ -36,14 +29,6 @@
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>com.pages.LogoutServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>test</servlet-name>
-        <url-pattern>/test</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Jdbc</servlet-name>
-        <url-pattern>/Jdbc</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/doLogin</url-pattern>
@@ -54,7 +39,7 @@
     </servlet-mapping>
     <session-config>
         <session-timeout>
-            30
+            20
         </session-timeout>
     </session-config>
 </web-app>
