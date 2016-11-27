@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.model.JDBC1;
+import java.sql.Connection;
+
 /**
  *
  * @author Luke James
@@ -33,38 +36,42 @@ public class LoginServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("text/html;charset=UTF-8");
 
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession();
 
-        JDBC1 jdbc = (JDBC1) session.getAttribute("dbbean");
-        if (jdbc == null) {
-            request.getRequestDispatcher("/WEB-INF/conDBErr.jsp").forward(request, response);
+        JDBC1 jdbc = new JDBC1();
+
+        jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
+        session.setAttribute("dbConn", jdbc);
+
+        if ((Connection) request.getServletContext().getAttribute("connection") == null) {
+            request.getRequestDispatcher("/WEB-INF/conErr.jsp").forward(request, response);
         } else {
-            
+
             String username = null, password = null;
 
             username = (String) request.getParameter("username");
             password = (String) request.getParameter("pswd");
 
             String authKey = jdbc.authLogin(username, password);
-            
+
             if (authKey == "APPLIED" || authKey == "MEMBER" || authKey == "ADMIN") {
                 session.setAttribute(username, username);
-                session.setAttribute(username, authKey );
+                session.setAttribute(username, authKey);
                 //set session to expire in 20 minutes
-                session.setMaxInactiveInterval(20*60);
+                session.setMaxInactiveInterval(20 * 60);
                 Cookie user = new Cookie("user", username);
-                user.setMaxAge(20*60);
+                user.setMaxAge(20 * 60);
                 response.addCookie(user);
                 response.sendRedirect("loginSuccess.jsp");
             } else {
-                //request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
-                RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.jsp");
-			PrintWriter out = response.getWriter();
-			out.println("<font color=red>Either user name or password is wrong.</font>");
-			rd.include(request, response);
+                request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+                RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
+                PrintWriter out = response.getWriter();
+                out.println("<font color=red>Either username or password is wrong.</font>");
+                rd.include(request, response);
             }
         }
     }

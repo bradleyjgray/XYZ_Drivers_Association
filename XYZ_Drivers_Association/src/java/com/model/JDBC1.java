@@ -45,13 +45,13 @@ public class JDBC1 {
         String str = "select * from users";
         String insert = "INSERT INTO `Users` (`username`, `password`)";
         String update = "UPDATE users(*) SET username&password ";
-        String db = "MyDB";
+        String db = "xyz_assoc";
 
         Jdbc jdbc = new Jdbc(str);
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://hostinger.co.uk:3306/u667329521_xyz" + db.trim(), "u667329521_user", "Scarlet");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+db.trim(), "root", "");
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Java Exception:" + e);
         }
