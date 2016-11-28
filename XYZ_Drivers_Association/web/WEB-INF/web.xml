@@ -33,6 +33,14 @@
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>com.pages.LogoutServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DisplayMembers</servlet-name>
+        <servlet-class>com.web.DisplayMembers</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DisplayClaims</servlet-name>
+        <servlet-class>com.web.DisplayClaims</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/doLogin</url-pattern>
@@ -40,6 +48,14 @@
     <servlet-mapping>
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DisplayMembers</servlet-name>
+        <url-pattern>/DisplayMembers</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DisplayClaims</servlet-name>
+        <url-pattern>/DisplayClaims</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
