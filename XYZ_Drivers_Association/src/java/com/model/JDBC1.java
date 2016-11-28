@@ -39,24 +39,6 @@ public class JDBC1 {
      * @param args the command line arguments
      * @throws java.sql.SQLException
      */
-    public static void main(String[] args) throws SQLException {
-
-        String str = "select * from users";
-        String insert = "INSERT INTO `Users` (`username`, `password`)";
-        String update = "UPDATE users(*) SET username&password ";
-        String db = "xyz_assoc";
-
-        Jdbc jdbc = new Jdbc(str);
-        Connection connection = null;
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + db.trim(), "root", "");
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Java Exception:" + e);
-        }
-        jdbc.connect(connection);
-
-    }
 
     public void connect(Connection con) throws SQLException {
 
@@ -67,7 +49,7 @@ public class JDBC1 {
         boolean bool = false;
 
         try {
-            select("select username from users where username='" + usr);
+            select("SELECT username FROM users WHERE username='" + usr);
             if (result.next()) {
                 System.out.println("EXISTS");
                 bool = true;
@@ -512,10 +494,12 @@ public class JDBC1 {
 
     public String authLogin(String user, String pass) {
 
-        String query = "SELECT * from USERS where id=" + user;
+        String query = "SELECT * FROM users WHERE id=" + user;
 
         String authKey = null;
-
+        
+        select(query);
+        
         try {
             while (result.next()) {
                 String pswd = result.getString("password");
@@ -528,6 +512,8 @@ public class JDBC1 {
             }
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            authKey = "failed!";
+            return authKey;
         }
 
         return authKey;

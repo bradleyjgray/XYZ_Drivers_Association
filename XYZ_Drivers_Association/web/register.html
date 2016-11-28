@@ -11,39 +11,23 @@
  </center>
         <h2>Account Details</h2>
         <div class="container">
-            <p>
-            <label><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" name="uname" required>
-            </p>
-            <p>
-            <label><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="psw" required>
-            </p>
-            <p>
-            <label><b>Confirm Password</b></label>
-            <input type="cpassword" placeholder="Confirm Password" name="cpsw" required>
-            </p>
-            
-            <p></p>
-        <h2>Address Details</h2>
-        <div class="container">
-            <p>
-            <label><b>Flat/Building Number</b></label>
-            <input type="text" placeholder="Flat/Building" name="flatbuild" required>
-            </p>
-            <p>
-            <label><b>Street Name</b></label>
-            <input type="text" placeholder="Street Name" name="street" required>
-            </p>
-            <p>
-            <label><b>Postal Code</b></label>
-            <input type="text" placeholder="Postcode" name="postal" required>
-            </p>
-            <p>
-            <button type="submit">Register</button>
-            </p>
+            <form action="RegisterServlet">
+                <p>
+                <label><b>Name</b></label>
+                <input type="text" placeholder="Name" name="name" required>
+                </p>
+                <p>
+                <label><b>Address</b></label>
+                <input type="text" placeholder="Address" name="address" required>
+                </p>
+                <p>
+                <label><b>Date of Birth</b></label>
+                <input type="text" placeholder="DOB" name="dob" required>
+                </p>
+                <p>
+                <button type="submit">Register</button>
+                </p>
+            </form>
         </div>
-   
-
-</body>
+    </body>
 </html>
