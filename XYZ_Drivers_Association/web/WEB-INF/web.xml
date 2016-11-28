@@ -45,6 +45,24 @@
         <servlet-name>RegisterServlet</servlet-name>
         <servlet-class>com.pages.RegisterServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MakeClaimServlet</servlet-name>
+        <servlet-class>com.web.MakeClaim</servlet-class>
+    </servlet>
+    <servlet>
+        <description>Making a Payment for a Claim</description>
+        <servlet-name>MakePaymentServlet</servlet-name>
+        <servlet-class>com.web.Payment</servlet-class>
+    </servlet>
+    <servlet>
+        <description>Check Membership Status of a User</description>
+        <servlet-name>CheckMemberStatusServlet</servlet-name>
+        <servlet-class>com.web.CheckMemberStatus</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MembersDashboardServlet</servlet-name>
+        <servlet-class>com.web.MembersDashboard</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/doLogin</url-pattern>
@@ -64,6 +82,22 @@
     <servlet-mapping>
         <servlet-name>RegisterServlet</servlet-name>
         <url-pattern>/RegisterServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MakeClaimServlet</servlet-name>
+        <url-pattern>/Members/makeClaim_member</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MakePaymentServlet</servlet-name>
+        <url-pattern>/Members/makePayment_applied</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckMemberStatusServlet</servlet-name>
+        <url-pattern>/Members/cehckstatus_applied</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MembersDashboardServlet</servlet-name>
+        <url-pattern>/Members/membersDashboard_applied</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

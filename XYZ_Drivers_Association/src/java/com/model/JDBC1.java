@@ -72,6 +72,19 @@ public class JDBC1 {
             System.out.println("err" + e);
         }
     }
+    
+    public void checkStatus(String username) throws SQLException{
+        
+        PreparedStatement pStatement = null;
+        String query = "SELECT * from USERS";
+        
+        while (result.next()) {
+            String id = result.getString("id");
+            String status = result.getString("status");
+        }
+        
+    }
+
 
     private ArrayList resultList() throws SQLException {
         ArrayList resultList = new ArrayList<>();
@@ -394,7 +407,7 @@ public class JDBC1 {
             System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
         }
     }
-
+    
     public void makeClaim(String memId, String rationale, float amount) {
 
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -437,6 +450,8 @@ public class JDBC1 {
 
         return memberClaims;
     }
+    
+    
 
     public float calcMembershipFee() {
 
