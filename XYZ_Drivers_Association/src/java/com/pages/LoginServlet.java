@@ -18,6 +18,9 @@ import javax.servlet.http.HttpSession;
 
 import com.model.JDBC1;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,7 +38,7 @@ public class LoginServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
 
         response.setContentType("text/html;charset=UTF-8");
 
@@ -66,6 +69,7 @@ public class LoginServlet extends HttpServlet {
                 user.setMaxAge(20 * 60);
                 response.addCookie(user);
                 response.sendRedirect("loginSuccess.jsp");
+                
             } else {
                 request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
                 RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
@@ -88,7 +92,11 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -102,7 +110,11 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

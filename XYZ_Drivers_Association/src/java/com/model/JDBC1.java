@@ -5,7 +5,6 @@
  */
 package com.model;
 
-import static java.lang.Math.random;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -51,7 +50,7 @@ public class JDBC1 {
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+db.trim(), "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + db.trim(), "root", "");
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Java Exception:" + e);
         }
@@ -59,7 +58,8 @@ public class JDBC1 {
 
     }
 
-    public void connect(Connection con) {
+    public void connect(Connection con) throws SQLException {
+
         connection = con;
     }
 
@@ -522,8 +522,7 @@ public class JDBC1 {
                 String status = result.getString("status");
                 if (pass.equals(pswd)) {
                     authKey = status;
-                }
-                else {
+                } else {
                     authKey = "failed!";
                 }
             }
