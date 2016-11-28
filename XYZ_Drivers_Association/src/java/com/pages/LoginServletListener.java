@@ -26,7 +26,7 @@ public class LoginServletListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext sc = sce.getServletContext();
-        String db = sc.getInitParameter("xyz_assoc");
+        String db = sc.getInitParameter("useDB");
         
         try {
             Class.forName("com.mysql.jdbc.Driver");
