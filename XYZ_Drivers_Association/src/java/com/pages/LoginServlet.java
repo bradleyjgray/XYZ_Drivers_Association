@@ -60,7 +60,7 @@ public class LoginServlet extends HttpServlet {
 
             String authKey = jdbc.authLogin(username, password);
 
-            if (authKey == "APPLIED" || authKey == "MEMBER" || authKey == "ADMIN") {
+            if (authKey.equals("APPLIED") || authKey.equals("MEMBER") || authKey.equals("ADMIN")) {
                 session.setAttribute(username, username);
                 session.setAttribute(username, authKey);
                 //set session to expire in 20 minutes
@@ -71,7 +71,7 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect("loginSuccess.jsp");
                 
             } else {
-                request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+               // request.getRequestDispatcher("/login.html").forward(request, response);
                 RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
                 PrintWriter out = response.getWriter();
                 out.println("<font color=red>Either username or password is wrong.</font>");
