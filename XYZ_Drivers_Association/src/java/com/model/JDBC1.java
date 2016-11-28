@@ -49,7 +49,7 @@ public class JDBC1 {
         boolean bool = false;
 
         try {
-            select("SELECT username FROM users WHERE username='" + usr);
+            select("SELECT username FROM users WHERE username='" + usr + "'");
             if (result.next()) {
                 System.out.println("EXISTS");
                 bool = true;
@@ -169,7 +169,7 @@ public class JDBC1 {
     }
 
     public void delete(String user) {
-        String del = "DELETE FROM users " + "WHERE username = '" + user.trim() + "'";
+        String del = "DELETE FROM users WHERE username ='" + user.trim() + "'";
 
         try {
             statement = connection.createStatement();
@@ -429,7 +429,7 @@ public class JDBC1 {
 
     public ArrayList listMemberClaims(String memId) throws SQLException {
 
-        String query = "SELECT * from Claims where mem_id=" + memId;
+        String query = "SELECT * from Claims where mem_id='" + memId + "'";
 
         select(query);
 
@@ -494,7 +494,7 @@ public class JDBC1 {
 
     public String authLogin(String user, String pass) {
 
-        String query = "SELECT * FROM users WHERE id=" + user;
+        String query = "select * from users where id='" + user+"'";
 
         String authKey = null;
         
@@ -507,7 +507,7 @@ public class JDBC1 {
                 if (pass.equals(pswd)) {
                     authKey = status;
                 } else {
-                    authKey = "failed!";
+                    authKey = "failed";
                 }
             }
         } catch (SQLException ex) {
