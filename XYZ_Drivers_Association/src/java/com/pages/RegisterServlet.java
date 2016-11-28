@@ -5,8 +5,10 @@
  */
 package com.pages;
 
+import com.model.JDBC1;
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,8 +33,21 @@ public class RegisterServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
+            JDBC1 jdbc = new JDBC1();
             
+            String name = request.getParameter("name");
+            String addr = request.getParameter("address");
+            String dob = request.getParameter("dob");
+            
+            String nameResult = jdbc.genUsr(name);
+            String passResult = jdbc.genPass(dob);
+            
+            request.setAttribute("genName", nameResult);
+            request.setAttribute("genPass", passResult);
+            
+            RequestDispatcher view = request.getRequestDispatcher("RegistrationSuccess.jsp");
+            
+            view.forward(request, response);
         }
     }
 

@@ -9,7 +9,7 @@
     <center>
         <h1>XYZ Drivers Association</h1>
         <p>
-        <form action="login.jsp">
+        <form action="login.html">
             <input type="submit" value="Login" />
         </form>
         </p>

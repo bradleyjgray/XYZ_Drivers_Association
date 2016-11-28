@@ -30,7 +30,7 @@ public class LoginServletListener implements ServletContextListener {
         
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+db.trim(), "root", "");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+ db.trim(), "root", "");
         }
         catch(ClassNotFoundException | SQLException e){
             sc.setAttribute("error", e);
