@@ -38,8 +38,12 @@
             if (message != null) {
                 out.println("<p><font color=red>Database Response:: " + message + "</p></font>");
             }
-            out.println("Claim List: " + messageList);
+            out.println("<br/>Claim List: " + messageList);
         %>
+        <br/><br/>
+        <form action="AdminDashboard.html">
+              <button action="AdminDashboard.html" name="request" type="submit" value="listMembers"> Dashboard Menu </button>
+        </form>
     </center>
 </body>
 </html>

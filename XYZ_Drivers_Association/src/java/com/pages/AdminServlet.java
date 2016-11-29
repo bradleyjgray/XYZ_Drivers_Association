@@ -132,14 +132,46 @@ public class AdminServlet extends HttpServlet {
                     memberList = jdbc.doList("Members", "*");
 
                     request.setAttribute("message", suspended);
-
                     request.setAttribute("messageList", memberList);
                     view = request.getRequestDispatcher("results.jsp");
                     view.forward(request, response);
                     break;
-                case "resumeMember":
-                    break;
                 case "reportTurnover":
+                    result = null;
+                    
+                    result = jdbc.calcMembershipFee();
+                    
+                    String[] financials = result.split(",");
+                    String claims = financials[0];
+                    String members = financials[1];
+                    String fee = financials[2];
+                    String income = financials[3];
+                    
+                    request.setAttribute("memberCount", members);
+                    request.setAttribute("claimTotal", claims);
+                    request.setAttribute("reccCharge", fee);
+                    request.setAttribute("totalIncome", income);
+                    view = request.getRequestDispatcher("FinancialReports.jsp");
+                    view.forward(request, response);
+                    break;
+                case "chargeMembers":
+                    result = jdbc.calcMembershipFee();
+                    String resultCharge = jdbc.chargeMembers();
+                    
+                    financials = result.split(",");
+                    claims = financials[0];
+                    members = financials[1];
+                    fee = financials[2];
+                    income = financials[3];
+                    
+                    request.setAttribute("memberCount", members);
+                    request.setAttribute("claimTotal", claims);
+                    request.setAttribute("reccCharge", fee);
+                    request.setAttribute("totalIncome", income);
+                    
+                    request.setAttribute("chargeResult", resultCharge);
+                    view = request.getRequestDispatcher("FinancialReports.jsp");
+                    view.forward(request, response);
                     break;
                 default:
                     break;

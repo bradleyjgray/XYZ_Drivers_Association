@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -551,12 +552,13 @@ public class JDBC1 {
 //
 //        return memberClaims;
 //    }
-    public float calcMembershipFee() {
+    public String calcMembershipFee() {
 
         String query = "SELECT * from Claims";
         String memQuery = "Select * from Members";
+        String paymentQuery = "Select * from payments";
 
-        float amount = 0.0f;
+        float amount = 0.0f, income = 0.0f;
         int memberCount = 0;
 
         select(query);
@@ -581,7 +583,7 @@ public class JDBC1 {
 
         try {
             while (result.next()) {
-                Date date = result.getDate("date");
+                Date date = (Date) result.getDate("date");
                 if (date.after(calendar.getTime()) && date.before(today)) {
                     amount += result.getFloat("amount");
                 }
@@ -599,10 +601,53 @@ public class JDBC1 {
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        select(paymentQuery);
+        
+        try {
+            while (result.next()){
+                Date date = (Date) result.getDate("date");
+                 if (date.after(calendar.getTime()) && date.before(today)) {
+                    income += result.getFloat("amount");
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         membershipFee = (amount / memberCount);
+        
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        membershipFee = Float.valueOf(df.format(membershipFee));
 
-        return membershipFee;
+        return String.valueOf(amount) + "," + String.valueOf(memberCount) + 
+                "," + String.valueOf(membershipFee) + "," + String.valueOf(income);
+    }
+    
+    public String chargeMembers() throws SQLException{
+        
+        String query = "Select * from Members";
+        
+        select(query);
+        
+        while (result.next()){
+            try {
+                float balance = result.getFloat("balance");
+                String id = result.getString("id");
+                PreparedStatement ps = null;
+                
+                ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                ps.setFloat(1, balance + membershipFee);
+                ps.setString(2, id);
+                ps.executeUpdate();
+                
+                ps.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return " BALANCE UPDATE SUCCESS :: " + membershipFee + " ADDED TO ALL BALANCES!";
     }
 
     public String authLogin(String user, String pass) {

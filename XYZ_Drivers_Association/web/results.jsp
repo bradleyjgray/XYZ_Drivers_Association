@@ -26,7 +26,7 @@
                        <p> Toggle List: </p>
                        <form action="AdminServlet">
                        <button action="AdminServlet" name="request" type="submit" value="listMembers"> All Members </button>
-                       <button action="AdminServlet" name="request" type="submit" value="listApplications"> Member Applications </button>
+                       <button action="AdminServlet" name="request" type="submit" value="listApplications"> Outstanding Applications </button>
                        <button action="AdminServlet" name="request" type="submit" value="listBalances"> Outstanding Balances </button>
                        </form>
                    </center>
@@ -41,8 +41,12 @@
             if (genResult != null){
             out.print("<p><font color=red>Database Message: " + genResult + "</font></p>");
             }
-            out.print("Database List: <br/><br/>" + genTable);
+            out.print("<br/>Database List: <br/><br/>" + genTable);
         %>
+        <br/><br/>
+        <form action="AdminDashboard.html">
+                       <button action="AdminDashboard.html" name="request" type="submit" value="listMembers"> Dashboard Menu </button>
+        </form>
     </center>
 </body>
 </html>
