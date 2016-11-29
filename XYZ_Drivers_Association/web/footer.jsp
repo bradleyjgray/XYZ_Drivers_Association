@@ -11,6 +11,8 @@
     String zone = zoneFormat.format(today);
     com.web.WeatherSOAP weather = new com.web.WeatherSOAP();
     com.web.WeatherSOAP.weather();
+    com.web.WeatherSOAP.XMLread();
+    out.print(com.web.WeatherSOAP.city);
 %>
 
 <p align="center"><font face="verdana"> Date: <%= date %> | Time: <%= time%> <%= zone %></font></p>
