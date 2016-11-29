@@ -126,7 +126,7 @@ public class JDBC1 {
         }
     }
 
-    public boolean addUsr(String[] name, String pass) {
+    public boolean addUsr(String name, String pass) {
 
         PreparedStatement pStatement = null;
         String usr = genUsr(name);
@@ -184,35 +184,39 @@ public class JDBC1 {
         }
     }
 
-    public String genUsr(String[] name) {
+    public String genUsr(String name) {
 
         String usrName = null;
 
-        String[] fName = name[0].split("");
+        String[] nameSplit = name.split(" ");
+        
+        String[] charSplit = name.split("");
 
-        usrName = fName[0] + name[1];
-
+        usrName = charSplit[0].toLowerCase() + charSplit[1].toLowerCase() + "-" + nameSplit[1].toLowerCase();
+        
         while (usrExists(usrName) == true) {
             Random random = new Random();
             int rand = random.nextInt(100 - 0) + 0;
             String randNum = Integer.toString(rand);
             usrName = usrName + randNum;
         }
+        
         System.out.println("Username is: " + usrName);
+        
         return usrName;
     }
 
     public String genPass(String dob) {
         String pass = null;
 
-        Date date = new Date();
-
-        try {
-            Date dobDate = new SimpleDateFormat("dd/mm/yy").parse(dob);
-            pass = dobDate.toString();
-        } catch (ParseException e) {
-            System.out.println("Incorrect Date Format!!");
+        if(pass.contains("/")) {
+            pass = dob.replace("/", "");
         }
+        else
+        {
+            pass = dob.replace("-", "");
+        }
+        
         return pass;
     }
 
@@ -231,7 +235,8 @@ public class JDBC1 {
         Date dob = new Date();
 
         String dateReg;
-        balance += membershipFee;
+
+        balance = setMemberFee(10);
 
         try {
             dateReg = dateFormat.format(dor);

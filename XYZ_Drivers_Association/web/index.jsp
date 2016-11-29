@@ -10,10 +10,12 @@
     <body>
         <jsp:include page="header.jsp"/>
     <center>
-        <form action="login.jsp">
+        <h1>XYZ Drivers Association</h1>
+        <p>
+        <form action="login.html">
             <input type="submit" value="Login" />
         </form>
-</center>
+    </center>
         <jsp:include page="footer.jsp"/>
 </body>
 </html>
