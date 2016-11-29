@@ -46,10 +46,6 @@
         <servlet-class>com.web.DisplayMembers</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>DisplayClaims</servlet-name>
-        <servlet-class>com.web.DisplayClaims</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>RegisterServlet</servlet-name>
         <servlet-class>com.pages.RegisterServlet</servlet-class>
     </servlet>
@@ -76,10 +72,6 @@
     <servlet-mapping>
         <servlet-name>DisplayMembers</servlet-name>
         <url-pattern>/DisplayMembers</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DisplayClaims</servlet-name>
-        <url-pattern>/DisplayClaims</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RegisterServlet</servlet-name>

@@ -9,9 +9,9 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Claims Management</title>
+        <title><center>Claims Management</center></title>
     </head>
-    <body>
+    <body> <center>
         <h1 style="font-size:300%;">Claims Management</h1>
 
         <form action="AdminServlet">
@@ -20,13 +20,19 @@
                 <input type="text" placeholder="Claim ID" name="claimId" required>
             </p>
             <p>
-                <label><b>Response</b></label>
-                <input type="text" placeholder="Approved/Rejected" name="response" required>
-            </p>
-            <p>
-                <button name="request" type="submit" value="respondClaim">Respond</button>
+                <button name="request" type="submit" value="AcceptClaim">Accept</button>
+                <button name="request" type="submit" value="RejectClaim">Reject</button>
         </form>
-        <c:out value="${message }"></c:out>
-        <c:out value="${messageList }"></c:out>
+                <%
+            String message = (String)request.getAttribute("message");
+            String messageList = (String)request.getAttribute("messageList");
+            
+            
+            if (message != null){
+            out.println("<p><font color=red>Database Response:: " + message + "</p></font>");
+            }
+            out.println("<br/><br/>Claim List: " + messageList);
+        %>
+    </center>
     </body>
 </html>

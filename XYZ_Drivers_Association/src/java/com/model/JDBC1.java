@@ -100,7 +100,9 @@ public class JDBC1 {
             String[] entry = new String[columns];
             for (int i = 1; i < columns; i++) {
                 entry[i - 1] = result.getString(i);
+
             }
+            entry[columns - 1] = String.valueOf(result.getFloat(columns));
             resultList.add(entry);
         }
         return resultList;
@@ -207,32 +209,31 @@ public class JDBC1 {
         String usrName = null;
 
         String[] nameSplit = name.split(" ");
-        
+
         String[] charSplit = name.split("");
 
         usrName = charSplit[0].toLowerCase() + charSplit[1].toLowerCase() + "-" + nameSplit[1].toLowerCase();
-        
+
         /*while (usrExists(usrName) == true) {
             Random random = new Random();
             int rand = random.nextInt(100 - 0) + 0;
             String randNum = Integer.toString(rand);
             usrName = usrName + randNum;
         }*/
-        
         return usrName;
     }
 
     public String genPass(String dob) {
         String pass = dob;
 
-        if(pass.contains("/")) {
+        if (pass.contains("/")) {
             pass = dob.replace("/", "-");
             String[] dateEdit = pass.split("-");
             String[] year = dateEdit[2].split("");
             String newDate = dateEdit[0] + dateEdit[1] + year[2] + year[3];
             pass = newDate;
         }
-        
+
         return pass;
     }
 
@@ -245,7 +246,7 @@ public class JDBC1 {
     public void createMember(String id, String name, String addr, String dob_String, String status) throws SQLException {
 
         PreparedStatement pStatement = null;
-        
+
         dob_String = dob_String.replace("/", "-");
         String[] split = dob_String.split("-");
         dob_String = split[2] + "-" + split[1] + "-" + split[0];
@@ -253,13 +254,13 @@ public class JDBC1 {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date dor = new Date();
         Date dob = null;
-        
+
         try {
             dob = dateFormat.parse(dob_String);
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-       
+
         String dateReg;
 
         balance = setMemberFee(10);
@@ -270,7 +271,7 @@ public class JDBC1 {
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         java.sql.Date sqlDOB = new java.sql.Date(dob.getTime());
         java.sql.Date sqlDOR = new java.sql.Date(dor.getTime());
 
@@ -293,24 +294,32 @@ public class JDBC1 {
 
     }
 
-    public void suspendMember(String userId) throws SQLException {
+    public String suspendMember(String userId) throws SQLException {
 
         //String query = "SELECT * from Members where id='" + userId + "'";
         PreparedStatement pStatement = null;
 
         //select(query);
-        pStatement = connection.prepareStatement(" UPDATE Members SET status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-        pStatement.setString(0, "APPLIED");
-        pStatement.setString(1, userId);
+        try {
+            pStatement = connection.prepareStatement(" UPDATE Members SET status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, "SUSPENDED");
+            pStatement.setString(2, userId);
+            pStatement.executeUpdate();
 
-        pStatement.close();
+            pStatement.close();
 
-        pStatement = connection.prepareStatement(" UPDATE Users SET status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-        pStatement.setString(0, "APPLIED");
-        pStatement.setString(1, userId);
+            pStatement = connection.prepareStatement(" UPDATE Users SET status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, "SUSPENDED");
+            pStatement.setString(2, userId);
+            pStatement.executeUpdate();
 
-        pStatement.close();
-        System.out.println("1 line updated across 2 tables.");
+            pStatement.close();
+            System.out.println("USER SUSPENDED!");
+        } catch (SQLException e) {
+            System.out.println("FAILED TO SUSPEND USER");
+            return "MEMBERSHIP SUSPEND FAILED!";
+        }
+        return " SUSPENDED";
     }
 
     public String appliedToMember(String id_user) throws SQLException {
@@ -318,35 +327,28 @@ public class JDBC1 {
         String query = "SELECT * from users where id='" + id_user + "'";
         PreparedStatement pStatement = null;
 
-        select(query);
+        try {
+            pStatement = connection.prepareStatement("UPDATE users SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, "MEMBER");
+            pStatement.setString(2, id_user);
+            pStatement.executeUpdate();
 
-        while (result.next()) {
-            String id = result.getString("id");
-            String pswd = result.getString("password");
-            String status = result.getString("status");
+            pStatement.close();
 
-            if (id_user.equals(id)) {
-                try {
-                    pStatement = connection.prepareStatement("Update users Set status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-                    pStatement.setString(0, "MEMBER");
-                    pStatement.setString(1, id_user);
+            pStatement = connection.prepareStatement("UPDATE Members SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, "MEMBER");
+            pStatement.setString(2, id_user);
+            pStatement.executeUpdate();
 
-                    pStatement.close();
+            pStatement.close();
 
-                    pStatement = connection.prepareStatement("Update Members Set status=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-                    pStatement.setString(0, "MEMBER");
-                    pStatement.setString(1, id_user);
-
-                    pStatement.close();
-
-                    System.out.println("1 line updated across 2 tables.");
-                } catch (SQLException e) {
-                    System.out.println("FAILED to UPDATE MEMBER STATUS! " + e);
-                }
-                break;
-            }
+            System.out.println("1 line updated across 2 tables.");
+        } catch (SQLException e) {
+            System.out.println("FAILED to UPDATE MEMBER STATUS! " + e);
+            return "MEMBERSHIP UPGRADE FAILED!";
         }
-        return "2 lines updated.";
+
+        return " IS NOW A MEMBER.";
     }
 
     public void makePayment(String memId, float amount, String payType) {
@@ -410,10 +412,13 @@ public class JDBC1 {
             while (result.next()) {
                 String memberId = result.getString("memID");
                 Date claimDate = result.getDate("date");
+                String status = result.getString("status");
                 //check if date is after 12 months ago and before today
                 if (claimDate.after(calendar.getTime()) && claimDate.before(today)) {
                     if (memId.equals(memberId)) {
-                        claimCount++;
+                        if (status.equals("ACCEPTED")) {
+                            claimCount++;
+                        }
                     }
                 }
             }
@@ -446,9 +451,10 @@ public class JDBC1 {
         if (response != null) {
             if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
                 try {
-                    pStatement = connection.prepareStatement("Update Claims Set status=? where mem_id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-                    pStatement.setString(0, response);
-                    pStatement.setString(1, claimId);
+                    pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                    pStatement.setString(1, response);
+                    pStatement.setString(2, claimId);
+                    pStatement.executeUpdate();
 
                     pStatement.close();
                     System.out.println("1 line updated.");
@@ -597,7 +603,6 @@ public class JDBC1 {
         } else {
             query = "SELECT * from " + lookUp + " WHERE " + where + "";
         }
-
         select(query);
         try {
             resultTbl = resultTable(resultList());
@@ -606,4 +611,5 @@ public class JDBC1 {
         }
         return resultTbl;
     }
+
 }
