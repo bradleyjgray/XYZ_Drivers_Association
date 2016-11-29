@@ -429,7 +429,7 @@ public class JDBC1 {
 
         try {
             while (result.next()) {
-                String memberId = result.getString("memID");
+                String memberId = result.getString("mem_ID");
                 Date claimDate = (Date) result.getDate("date");
                 String status = result.getString("status");
                 //check if date is after 12 months ago and before today
@@ -463,8 +463,20 @@ public class JDBC1 {
             break;
         }
 
-        if (claimCount(mem_id) > 2) {
-            return "REJECTED:: Two claims already made this year!";
+        if (claimCount(mem_id) >= 2) {
+            response = "REJECTED";
+            try {
+                    pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                    pStatement.setString(1, response);
+                    pStatement.setString(2, claimId);
+                    pStatement.executeUpdate();
+
+                    pStatement.close();
+                    System.out.println("1 line updated.");
+                } catch (SQLException ex) {
+                    Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            return "CLAIM REJECTED:: USER ALREADY HAS 2 ACCEPTED CLAIMS IN THE LAST 12 MONTHS!";
         }
 
         if (response != null) {
@@ -486,7 +498,7 @@ public class JDBC1 {
         } else {
             System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
         }
-        return response;
+        return "CLAIM " + response;
     }
 
     public void makeClaim(String memId, String rationale, float amount) {
