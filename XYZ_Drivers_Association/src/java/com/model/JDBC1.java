@@ -329,14 +329,14 @@ public class JDBC1 {
 
         try {
             pStatement = connection.prepareStatement("UPDATE users SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(1, "MEMBER");
+            pStatement.setString(1, "APPROVED");
             pStatement.setString(2, id_user);
             pStatement.executeUpdate();
 
             pStatement.close();
 
             pStatement = connection.prepareStatement("UPDATE Members SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(1, "MEMBER");
+            pStatement.setString(1, "APPROVED");
             pStatement.setString(2, id_user);
             pStatement.executeUpdate();
 
@@ -348,7 +348,7 @@ public class JDBC1 {
             return "MEMBERSHIP UPGRADE FAILED!";
         }
 
-        return " IS NOW A MEMBER.";
+        return " IS NOW AN APPROVED MEMBER.";
     }
 
     public void makePayment(String memId, float amount, String payType) {
