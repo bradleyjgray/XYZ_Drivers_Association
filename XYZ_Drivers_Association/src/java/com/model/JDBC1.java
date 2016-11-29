@@ -49,7 +49,7 @@ public class JDBC1 {
         boolean bool = false;
 
         try {
-            select("SELECT username FROM users WHERE username='" + usr + "'");
+            select("SELECT id FROM users WHERE ='" + usr + "'");
             if (result.next()) {
                 System.out.println("EXISTS");
                 bool = true;
@@ -133,15 +133,14 @@ public class JDBC1 {
     public boolean addUsr(String name, String pass) {
 
         PreparedStatement pStatement = null;
-        String usr = genUsr(name);
-        String pswd = genPass(pass);
         String status = "APPLIED";
 
         try {
-            pStatement = connection.prepareStatement("INSERT INTO Users VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(0, usr);
-            pStatement.setString(1, pswd);
-            pStatement.setString(2, status);
+            pStatement = connection.prepareStatement("insert into users(id, password, status) values (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, name);
+            pStatement.setString(2, pass);
+            pStatement.setString(3, status);
+            pStatement.executeUpdate();
 
             pStatement.close();
             System.out.println("USER ADDED!");
@@ -198,27 +197,25 @@ public class JDBC1 {
 
         usrName = charSplit[0].toLowerCase() + charSplit[1].toLowerCase() + "-" + nameSplit[1].toLowerCase();
         
-        while (usrExists(usrName) == true) {
+        /*while (usrExists(usrName) == true) {
             Random random = new Random();
             int rand = random.nextInt(100 - 0) + 0;
             String randNum = Integer.toString(rand);
             usrName = usrName + randNum;
-        }
-        
-        System.out.println("Username is: " + usrName);
+        }*/
         
         return usrName;
     }
 
     public String genPass(String dob) {
-        String pass = null;
+        String pass = dob;
 
         if(pass.contains("/")) {
-            pass = dob.replace("/", "");
-        }
-        else
-        {
-            pass = dob.replace("-", "");
+            pass = dob.replace("/", "-");
+            String[] dateEdit = pass.split("-");
+            String[] year = dateEdit[2].split("");
+            String newDate = dateEdit[0] + dateEdit[1] + year[2] + year[3];
+            pass = newDate;
         }
         
         return pass;
@@ -234,9 +231,16 @@ public class JDBC1 {
 
         PreparedStatement pStatement = null;
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date dor = new Date();
         Date dob = new Date();
+        
+        
+        try {
+            dob = dateFormat.parse(dob_String);
+        } catch (ParseException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         String dateReg;
 
@@ -245,20 +249,23 @@ public class JDBC1 {
         try {
             dateReg = dateFormat.format(dor);
             dor = dateFormat.parse(dateReg);
-            dob = dateFormat.parse(dob_String);
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        java.sql.Date sqlDOB = new java.sql.Date(dob.getTime());
+        java.sql.Date sqlDOR = new java.sql.Date(dor.getTime());
 
         try {
-            pStatement = connection.prepareStatement("INSERT INTO Members VALUES (?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(0, id);
-            pStatement.setString(1, name);
-            pStatement.setString(2, addr);
-            pStatement.setDate(3, (java.sql.Date) dob);
-            pStatement.setDate(4, (java.sql.Date) dor);
-            pStatement.setString(5, status);
-            pStatement.setFloat(6, balance);
+            pStatement = connection.prepareStatement("insert into Members (id, name, address, dob, dor, status, balance) values (?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, id);
+            pStatement.setString(2, name);
+            pStatement.setString(3, addr);
+            pStatement.setDate(4, (java.sql.Date) sqlDOB);
+            pStatement.setDate(5, (java.sql.Date) sqlDOR);
+            pStatement.setString(6, status);
+            pStatement.setFloat(7, balance);
+            pStatement.executeUpdate();
 
             pStatement.close();
             System.out.println("1 line added.");

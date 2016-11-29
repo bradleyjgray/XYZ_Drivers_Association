@@ -8,6 +8,7 @@ package com.pages;
 import com.model.JDBC1;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -35,30 +37,43 @@ public class RegisterServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+            HttpSession session = request.getSession();
+            
             JDBC1 jdbc = new JDBC1();
             
-            String name = request.getParameter("name");
-            String addr = request.getParameter("address");
-            String dob = request.getParameter("dob");
-            
-            String nameResult = jdbc.genUsr(name);
-            String passResult = jdbc.genPass(dob);
-            
             try {
-                jdbc.createMember(nameResult, name, addr, dob, "APPLIED");
-                jdbc.addUsr(nameResult, passResult);
+                jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
             } catch (SQLException ex) {
                 Logger.getLogger(RegisterServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
+            session.setAttribute("dbConn", jdbc);
             
-            request.setAttribute("genName", nameResult);
-            request.setAttribute("genPass", passResult);
+            if ((Connection) request.getServletContext().getAttribute("connection") == null) {
+            request.getRequestDispatcher("/WEB-INF/conErr.jsp").forward(request, response);
+            } 
+            else 
+            {
+                String name = request.getParameter("name");
+                String addr = request.getParameter("addr");
+                String dob = request.getParameter("dob");
             
-            RequestDispatcher view = request.getRequestDispatcher("RegistrationSuccess.jsp");
+                String nameResult = jdbc.genUsr(name);
+                String passResult = jdbc.genPass(dob);
             
-            view.forward(request, response);
-        }
+                try {
+                    jdbc.createMember(nameResult, name, addr, dob, "APPLIED");
+                    jdbc.addUsr(nameResult, passResult);
+                } catch (SQLException ex) {
+                    Logger.getLogger(RegisterServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            
+                request.setAttribute("genName", nameResult);
+                request.setAttribute("genPass", passResult);
+            
+                RequestDispatcher view = request.getRequestDispatcher("RegistrationSuccess.jsp");
+            
+                view.forward(request, response);
+            }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -4,7 +4,7 @@
         <param-name>useDB</param-name>
         <param-value>xyz_assoc</param-value>
     </context-param>
-    <filter>
+    <!--<filter>
         <filter-name>RequestLogFilter</filter-name>
         <filter-class>com.filters.RequestLogFilter</filter-class>
     </filter>
@@ -20,7 +20,7 @@
         <filter-name>RequestLogFilter</filter-name>
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
-    </filter-mapping>
+    </filter-mapping>-->
     <!--<filter>
         <filter-name>MemberFilter</filter-name>
         <filter-class>com.filters.MemberFilter</filter-class>

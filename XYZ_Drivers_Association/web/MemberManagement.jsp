@@ -14,6 +14,10 @@
     <body>
         <h1 style="font-size:300%;">Member Management</h1>
         
+        <form action="DisplayMembers">
+            <input type="submit" value="Display Members" />
+        </form>
+        
         <form action="AdminDashboard.html">
             <input type="submit" value="Return" />
         </form>

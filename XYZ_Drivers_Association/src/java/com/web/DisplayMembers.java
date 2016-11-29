@@ -5,6 +5,7 @@
  */
 package com.web;
 
+import com.model.JDBC1;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.RequestDispatcher;
@@ -34,6 +35,10 @@ public class DisplayMembers extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             RequestDispatcher view = request.getRequestDispatcher("MemberManagement.jsp");
             view.forward(request, response);
+            
+            JDBC1 jdbc = new JDBC1();
+            
+            
         }
     }
 

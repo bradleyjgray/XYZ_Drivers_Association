@@ -15,15 +15,15 @@
     </head>
     <body>
         <h1>Registration Successful!</h1>
-        
+        <p>
         <%
             String genName = (String)request.getAttribute("genName");
             String genPass = (String)request.getAttribute("genPass");
             
-            out.print("Username: %s", genName);
-            out.print(" Password: %s", genPass);
+            out.print("Username: " + genName);
+            out.print("\nPassword: " + genPass);
         %>
-        
+        </p>
         <form action="login.html">
             <input type="submit" value="Return to Login" />
         </form>
