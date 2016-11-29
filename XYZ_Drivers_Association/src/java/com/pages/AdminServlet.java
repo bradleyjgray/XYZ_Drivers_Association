@@ -50,6 +50,16 @@ public class AdminServlet extends HttpServlet {
 
         String claimID = null, claimResponse = null;
 
+        if (cmd.equals("AcceptClaim")) {
+            claimID = request.getParameter("claimId");
+            claimResponse = "ACCEPTED";
+            cmd = "respondClaim";
+        } else if (cmd.equals("RejectClaim")) {
+            claimID = request.getParameter("claimId");
+            claimResponse = "REJECTED";
+            cmd = "respondClaim";
+        }
+
         JDBC1 jdbc = new JDBC1();
 
         jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
@@ -62,48 +72,55 @@ public class AdminServlet extends HttpServlet {
             switch (cmd) {
                 case "listMembers":
                     String memberList = jdbc.doList("Members", "*");
-                    request.setAttribute("message", memberList);
+                    request.setAttribute("messageList", memberList);
                     RequestDispatcher view = request.getRequestDispatcher("results.jsp");
                     view.forward(request, response);
                     break;
                 case "listClaims":
                     String claimList = jdbc.doList("Claims", "*");
-                    request.setAttribute("message", claimList);
-                    view = request.getRequestDispatcher("results.jsp");
+                    request.setAttribute("messageList", claimList);
+                    view = request.getRequestDispatcher("ProcessClaim.jsp");
                     view.forward(request, response);
                     break;
                 case "listApplications":
                     String applicationList = jdbc.doList("Members", "status ='APPLIED'");
-                    request.setAttribute("message", applicationList);
+                    request.setAttribute("messageList", applicationList);
                     view = request.getRequestDispatcher("results.jsp");
                     view.forward(request, response);
                     break;
                 case "listBalances":
                     String balanceList = jdbc.doList("Members", "balance > '0.0f'");
-                    request.setAttribute("message", balanceList);
+                    request.setAttribute("messageList", balanceList);
                     view = request.getRequestDispatcher("results.jsp");
                     view.forward(request, response);
                     break;
                 case "respondClaim":
-                    String result = null;      
-                    claimID = (String) request.getAttribute("claimId");
-                    claimResponse = (String) request.getAttribute("response");
+                    String result = null;
                     result = jdbc.respondClaim(claimID, claimResponse);
                     request.setAttribute("message", result);
+
+                    String unrespondedList = jdbc.doList("Claims", "*");
+                    request.setAttribute("messageList", unrespondedList);
+
                     view = request.getRequestDispatcher("ProcessClaim.jsp");
                     view.forward(request, response);
                     break;
                 case "unrespondedClaims":
-                    String unrespondedList = jdbc.doList("Claims", "status = 'PENDING'");
+                    unrespondedList = jdbc.doList("Claims", "status = 'PENDING'");
                     request.setAttribute("messageList", unrespondedList);
                     view = request.getRequestDispatcher("ProcessClaim.jsp");
                     view.forward(request, response);
                     break;
                 case "processApplication":
                     String upgraded = null;
-                    user = (String) request.getAttribute("username");
+
+                    user = (String) request.getParameter("username");
                     upgraded = jdbc.appliedToMember(user);
+                    memberList = jdbc.doList("Members", "*");
+
                     request.setAttribute("message", upgraded);
+
+                    request.setAttribute("messageList", memberList);
                     view = request.getRequestDispatcher("results.jsp");
                     view.forward(request, response);
                     break;
