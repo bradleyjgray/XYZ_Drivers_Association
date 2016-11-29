@@ -455,15 +455,19 @@ public class JDBC1 {
 
         String query = "SELECT * from Claims where id='" + claimId + "'";
         String mem_id = null;
+        String claimStatus = null;
 
         select(query);
 
         while (result.next()) {
             mem_id = result.getString("mem_id");
+            claimStatus = result.getString("status");
             break;
         }
+        
+        if (!claimStatus.equals(response)){
 
-        if (claimCount(mem_id) >= 2) {
+        if (response.equals("ACCEPTED") && claimCount(mem_id) >= 2) {
             response = "REJECTED";
             try {
                     pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
@@ -497,6 +501,10 @@ public class JDBC1 {
             }
         } else {
             System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
+        }
+        }
+        else {
+            return " RESPONSE IDENTICAL TO ENTRY :: NO CHANGE!";
         }
         return "CLAIM " + response;
     }
