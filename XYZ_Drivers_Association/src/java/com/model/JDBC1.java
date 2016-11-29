@@ -71,6 +71,25 @@ public class JDBC1 {
             System.out.println("err" + e);
         }
     }
+    
+    public int claimCounter(String userID) {
+        int count = 0;
+        
+        select("SELECT * FROM Claims WHERE mem_id='" + userID + "'");
+        
+        
+        if (result != null) {  
+            try {
+                result.beforeFirst();
+                result.last();  
+                count = result.getRow();
+            } catch (SQLException ex) {
+                Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }  
+        
+        return count;
+    }
 
     private ArrayList resultList() throws SQLException {
         ArrayList resultList = new ArrayList<>();

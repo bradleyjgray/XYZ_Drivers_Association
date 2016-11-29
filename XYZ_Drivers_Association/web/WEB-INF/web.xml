@@ -57,6 +57,14 @@
         <servlet-name>AdminServlet</servlet-name>
         <servlet-class>com.pages.AdminServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MembersServlet</servlet-name>
+        <servlet-class>com.pages.MembersServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StatusServlet</servlet-name>
+        <servlet-class>com.pages.StatusServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/doLogin</url-pattern>
@@ -80,6 +88,14 @@
     <servlet-mapping>
         <servlet-name>AdminServlet</servlet-name>
         <url-pattern>/AdminServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MembersServlet</servlet-name>
+        <url-pattern>/MembersServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StatusServlet</servlet-name>
+        <url-pattern>/StatusServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Login Successful</title>
     </head>
     <body>
         <h1><%
@@ -33,7 +33,7 @@
                 }
             }
             if (key.equals("APPLIED") || key.equals("MEMBER")){
-                response.sendRedirect("/Members/membersDashboard.jsp");
+                response.sendRedirect("membersDashboard.jsp");
             }
             else {
                 response.sendRedirect("AdminDashboard.html");
