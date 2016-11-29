@@ -80,8 +80,10 @@ public class JDBC1 {
         while (result.next()) {
             String[] entry = new String[columns];
             for (int i = 1; i < columns; i++) {
-                entry[i - 1] = result.getString(i);
+                entry[i-1] = result.getString(i);
+                
             }
+            entry[columns-1] = String.valueOf(result.getFloat(columns));
             resultList.add(entry);
         }
         return resultList;
@@ -578,7 +580,6 @@ public class JDBC1 {
         } else {
             query = "SELECT * from " + lookUp + " WHERE " + where + "";
         }
-
         select(query);
         try {
             resultTbl = resultTable(resultList());
@@ -587,4 +588,5 @@ public class JDBC1 {
         }
         return resultTbl;
     }
+
 }

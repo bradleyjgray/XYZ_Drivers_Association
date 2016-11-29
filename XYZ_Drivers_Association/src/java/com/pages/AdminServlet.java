@@ -59,63 +59,63 @@ public class AdminServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/conErr.jsp").forward(request, response);
         } else {
 
-//            switch (cmd) {
-//                case "listMembers":
-//                    String memberList = jdbc.doList("Members", "*");
-//                    request.setAttribute("message", memberList);
-//                    RequestDispatcher view = request.getRequestDispatcher("results.jsp");
-//                    view.forward(request, response);
-//                    break;
-//                case "listClaims":
-//                    String claimList = jdbc.doList("Claims", "*");
-//                    request.setAttribute("message", claimList);
-//                    view = request.getRequestDispatcher("results.jsp");
-//                    view.forward(request, response);
-//                    break;
-//                case "listApplications":
-//                    String applicationList = jdbc.doList("Members", "status ='APPLIED'");
-//                    request.setAttribute("message", applicationList);
-//                    view = request.getRequestDispatcher("results.jsp");
-//                    view.forward(request, response);
-//                    break;
-//                case "listBalances":
-//                    String balanceList = jdbc.doList("Members", "balance > '0.0f'");
-//                    request.setAttribute("message", balanceList);
-//                    view = request.getRequestDispatcher("results.jsp");
-//                    view.forward(request, response);
-//                    break;
-//                case "respondClaim":
-//                    String result = null;      
-//                    claimID = (String) request.getAttribute("claimId");
-//                    claimResponse = (String) request.getAttribute("response");
-//                    result = jdbc.respondClaim(claimID, claimResponse);
-//                    request.setAttribute("message", result);
-//                    view = request.getRequestDispatcher("ProcessClaim.jsp");
-//                    view.forward(request, response);
-//                    break;
-//                case "unrespondedClaims":
-//                    String unrespondedList = jdbc.doList("Claims", "status = 'PENDING'");
-//                    request.setAttribute("messageList", unrespondedList);
-//                    view = request.getRequestDispatcher("ProcessClaim.jsp");
-//                    view.forward(request, response);
-//                    break;
-//                case "processApplication":
-//                    String upgraded = null;
-//                    user = (String) request.getAttribute("username");
-//                    upgraded = jdbc.appliedToMember(user);
-//                    request.setAttribute("message", upgraded);
-//                    view = request.getRequestDispatcher("results.jsp");
-//                    view.forward(request, response);
-//                    break;
-//                case "suspendMember":
-//                    break;
-//                case "resumeMember":
-//                    break;
-//                case "reportTurnover":
-//                    break;
-//                default:
-//                    break;
-//            }
+            switch (cmd) {
+                case "listMembers":
+                    String memberList = jdbc.doList("Members", "*");
+                    request.setAttribute("message", memberList);
+                    RequestDispatcher view = request.getRequestDispatcher("results.jsp");
+                    view.forward(request, response);
+                    break;
+                case "listClaims":
+                    String claimList = jdbc.doList("Claims", "*");
+                    request.setAttribute("message", claimList);
+                    view = request.getRequestDispatcher("results.jsp");
+                    view.forward(request, response);
+                    break;
+                case "listApplications":
+                    String applicationList = jdbc.doList("Members", "status ='APPLIED'");
+                    request.setAttribute("message", applicationList);
+                    view = request.getRequestDispatcher("results.jsp");
+                    view.forward(request, response);
+                    break;
+                case "listBalances":
+                    String balanceList = jdbc.doList("Members", "balance > '0.0f'");
+                    request.setAttribute("message", balanceList);
+                    view = request.getRequestDispatcher("results.jsp");
+                    view.forward(request, response);
+                    break;
+                case "respondClaim":
+                    String result = null;      
+                    claimID = (String) request.getAttribute("claimId");
+                    claimResponse = (String) request.getAttribute("response");
+                    result = jdbc.respondClaim(claimID, claimResponse);
+                    request.setAttribute("message", result);
+                    view = request.getRequestDispatcher("ProcessClaim.jsp");
+                    view.forward(request, response);
+                    break;
+                case "unrespondedClaims":
+                    String unrespondedList = jdbc.doList("Claims", "status = 'PENDING'");
+                    request.setAttribute("messageList", unrespondedList);
+                    view = request.getRequestDispatcher("ProcessClaim.jsp");
+                    view.forward(request, response);
+                    break;
+                case "processApplication":
+                    String upgraded = null;
+                    user = (String) request.getAttribute("username");
+                    upgraded = jdbc.appliedToMember(user);
+                    request.setAttribute("message", upgraded);
+                    view = request.getRequestDispatcher("results.jsp");
+                    view.forward(request, response);
+                    break;
+                case "suspendMember":
+                    break;
+                case "resumeMember":
+                    break;
+                case "reportTurnover":
+                    break;
+                default:
+                    break;
+            }
 
         }
     }

@@ -26,7 +26,15 @@
             <p>
                 <button name="request" type="submit" value="respondClaim">Respond</button>
         </form>
-        <c:out value="${message }"></c:out>
-        <c:out value="${messageList }"></c:out>
+                <%
+            String message = (String)request.getAttribute("message");
+            String messageList = (String)request.getAttribute("messageList");
+            
+            
+            if (message != null){
+            out.println("Database Response:: " + message);
+            }
+            out.println("<br/><br/>Claim List: " + messageList);
+        %>
     </body>
 </html>
