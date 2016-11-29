@@ -1,3 +1,3 @@
 <h1 align="center">
-    <img src="logo.jpg" alt="XYZ Drivers Association"> 
+    <img src="logo.png" alt="XYZ Drivers Association"> 
 </h1>
