@@ -381,6 +381,25 @@ public class JDBC1 {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public int yearlyClaimCount(String memId){
+        int count = 0;
+        
+        select("SELECT * FROM Claims WHERE mem_id='" + memId + "'");
+        
+        
+        if (result != null) {  
+            try {
+                result.beforeFirst();
+                result.last();  
+                count = result.getRow();
+            } catch (SQLException ex) {
+                Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }  
+        
+        return count;
+    }
 
     public int claimCount(String memId) {
 
@@ -411,7 +430,7 @@ public class JDBC1 {
         try {
             while (result.next()) {
                 String memberId = result.getString("memID");
-                Date claimDate = result.getDate("date");
+                Date claimDate = (Date) result.getDate("date");
                 String status = result.getString("status");
                 //check if date is after 12 months ago and before today
                 if (claimDate.after(calendar.getTime()) && claimDate.before(today)) {
