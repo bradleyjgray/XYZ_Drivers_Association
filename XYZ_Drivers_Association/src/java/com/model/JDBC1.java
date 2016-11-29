@@ -230,18 +230,21 @@ public class JDBC1 {
     public void createMember(String id, String name, String addr, String dob_String, String status) throws SQLException {
 
         PreparedStatement pStatement = null;
+        
+        dob_String = dob_String.replace("/", "-");
+        String[] split = dob_String.split("-");
+        dob_String = split[2] + "-" + split[1] + "-" + split[0];
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date dor = new Date();
-        Date dob = new Date();
-        
+        Date dob = null;
         
         try {
             dob = dateFormat.parse(dob_String);
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+       
         String dateReg;
 
         balance = setMemberFee(10);
