@@ -73,16 +73,21 @@ public class JDBC1 {
         }
     }
     
-    public void checkStatus(String username) throws SQLException{
+    public boolean checkStatus(String username) throws SQLException{
         
+        boolean bool = false;
         PreparedStatement pStatement = null;
         String query = "SELECT * from USERS";
         
-        while (result.next()) {
-            String id = result.getString("id");
-            String status = result.getString("status");
+        select("SELECT status FROM users WHERE username='" + username + "'");
+        
+        String status = result.getString("status");
+        
+        if (result.getString(0).equals("APPLIED")){
+            
         }
         
+        return bool;
     }
 
 
