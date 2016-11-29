@@ -4,7 +4,7 @@
         <param-name>useDB</param-name>
         <param-value>xyz_assoc</param-value>
     </context-param>
-    <filter>
+    <!--<filter>
         <filter-name>RequestLogFilter</filter-name>
         <filter-class>com.filters.RequestLogFilter</filter-class>
     </filter>
@@ -21,7 +21,7 @@
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
-    <!--<filter>
+    <filter>
         <filter-name>MemberFilter</filter-name>
         <filter-class>com.filters.MemberFilter</filter-class>
     </filter>
@@ -53,6 +53,10 @@
         <servlet-name>RegisterServlet</servlet-name>
         <servlet-class>com.pages.RegisterServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <servlet-class>com.pages.AdminServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/doLogin</url-pattern>
@@ -72,6 +76,10 @@
     <servlet-mapping>
         <servlet-name>RegisterServlet</servlet-name>
         <url-pattern>/RegisterServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>/AdminServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

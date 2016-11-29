@@ -5,20 +5,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
+    <center>
         <h1 style="font-size:300%;">Admin Dashboard</h1>
         
-        <div class="container">
-        <p>
-        <form action="DisplayMembers">
-            <input type="submit" value="Members" />
-        </form>
-        </p>
-        
-        <p>
-        <form action="DisplayClaims">
-            <input type="submit" value="Claims" />
-        </form>
-        </p>
-        
+        <table width="50%">
+  <tbody>
+    <tr>
+        <td><form action="AdminServlet"><center><button name="request" type="submit" value="listMembers">List all members</button></center></form></td>
+
+        <td><form action="AdminServlet"><center><button name="request" type="submit" value="listBalances">List outstanding balances</button></center></form></td>
+    </tr>
+
+    <tr>
+        <td><form action="AdminServlet"><center><button name="request" type="submit" value="listClaims">List all claims</button></center></form></td>
+
+        <td><form action="AdminServlet"><center><button name="request" type="submit" value="listApplications">List member applications</button></center></td>
+    </tr>
+
+    <tr>
+        <td><form action="AdminServlet"><center><button name="request" type="submit" value="unrespondedClaims">Process Claim</button></center></td>
+
+        <td><form action="AdminServlet"><center><button name="request" type="submit" value="processApplication">Upgrade account</button></center></td>
+    </tr>
+
+    <tr>
+        <td><form action="AdminServlet"><center><button name="request" type="submit" value="suspendMember">Suspend/Resume member</button></center></td>
+
+        <td><form action="AdminServlet"><center><button name="request" type="submit" value="reportTurnover">Reports</button></center></td>
+    </tr>
+  </tbody>
+</table>
+    </center>
     </body>
 </html>

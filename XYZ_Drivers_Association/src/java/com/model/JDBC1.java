@@ -39,7 +39,6 @@ public class JDBC1 {
      * @param args the command line arguments
      * @throws java.sql.SQLException
      */
-
     public void connect(Connection con) throws SQLException {
 
         connection = con;
@@ -76,15 +75,12 @@ public class JDBC1 {
     private ArrayList resultList() throws SQLException {
         ArrayList resultList = new ArrayList<>();
 
-        if (!resultList.isEmpty()) {
-            resultList.clear();
-        }
         //get column count from result set data
         int columns = result.getMetaData().getColumnCount();
         while (result.next()) {
             String[] entry = new String[columns];
-            for (int i = 0; i < columns; i++) {
-                entry[i] = result.getString(i);
+            for (int i = 1; i < columns; i++) {
+                entry[i - 1] = result.getString(i);
             }
             resultList.add(entry);
         }
@@ -96,16 +92,16 @@ public class JDBC1 {
         String[] row;
 
         if (!entries.isEmpty()) {
-            sb.append("< table border=\"6\">");
+            sb.append("<table border=\"3\">");
             for (Object e : entries) {
                 sb.append("<tr>");
                 row = (String[]) e;
                 for (String entry : row) {
                     sb.append("<td>");
-                    sb.append(entry);
+                    sb.append(" " + entry + " ");
                     sb.append("</td>");
                 }
-                sb.append("</tr>");
+                sb.append("</tr>\n");
             }
             sb.append("</table>");
         } else {
@@ -263,9 +259,29 @@ public class JDBC1 {
 
     }
 
-    public void appliedToMember(String id_user) throws SQLException {
+    public void suspendMember(String userId) throws SQLException {
 
-        String query = "SELECT * from users";
+        //String query = "SELECT * from Members where id='" + userId + "'";
+        PreparedStatement pStatement = null;
+
+        //select(query);
+        pStatement = connection.prepareStatement(" UPDATE Members SET status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+        pStatement.setString(0, "APPLIED");
+        pStatement.setString(1, userId);
+
+        pStatement.close();
+
+        pStatement = connection.prepareStatement(" UPDATE Users SET status =? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+        pStatement.setString(0, "APPLIED");
+        pStatement.setString(1, userId);
+
+        pStatement.close();
+        System.out.println("1 line updated across 2 tables.");
+    }
+
+    public String appliedToMember(String id_user) throws SQLException {
+
+        String query = "SELECT * from users where id='" + id_user + "'";
         PreparedStatement pStatement = null;
 
         select(query);
@@ -289,14 +305,14 @@ public class JDBC1 {
 
                     pStatement.close();
 
-                    System.out.println("2 lines updated.");
+                    System.out.println("1 line updated across 2 tables.");
                 } catch (SQLException e) {
                     System.out.println("FAILED to UPDATE MEMBER STATUS! " + e);
                 }
                 break;
             }
         }
-
+        return "2 lines updated.";
     }
 
     public void makePayment(String memId, float amount, String payType) {
@@ -333,7 +349,7 @@ public class JDBC1 {
     public int claimCount(String memId) {
 
         //select from DB
-        String query = "SELECT * from Claims";
+        String query = "SELECT * from Claims where mem_id='" + memId + "'";
         select(query);
 
         //format todays date
@@ -374,25 +390,44 @@ public class JDBC1 {
         return claimCount;
     }
 
-    public void respondClaim(String claimId, String response) {
+    public String respondClaim(String claimId, String response) throws SQLException {
 
         //CLAIMS MADE SET AS 'PENDING' STATUS.
         PreparedStatement pStatement = null;
 
-        if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
-            try {
-                pStatement = connection.prepareStatement("Update Claims Set status=? where mem_id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-                pStatement.setString(0, response);
-                pStatement.setString(1, claimId);
+        String query = "SELECT * from Claims where id='" + claimId + "'";
+        String mem_id = null;
 
-                pStatement.close();
-                System.out.println("1 line updated.");
-            } catch (SQLException ex) {
-                Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        select(query);
+
+        while (result.next()) {
+            mem_id = result.getString("mem_id");
+            break;
+        }
+
+        if (claimCount(mem_id) > 2) {
+            return "REJECTED:: Two claims already made this year!";
+        }
+
+        if (response != null) {
+            if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
+                try {
+                    pStatement = connection.prepareStatement("Update Claims Set status=? where mem_id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                    pStatement.setString(0, response);
+                    pStatement.setString(1, claimId);
+
+                    pStatement.close();
+                    System.out.println("1 line updated.");
+                } catch (SQLException ex) {
+                    Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                return "CLAIM NOT AVAILABLE:: Please check claim number!";
             }
         } else {
             System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
         }
+        return response;
     }
 
     public void makeClaim(String memId, String rationale, float amount) {
@@ -427,17 +462,16 @@ public class JDBC1 {
         }
     }
 
-    public ArrayList listMemberClaims(String memId) throws SQLException {
-
-        String query = "SELECT * from Claims where mem_id='" + memId + "'";
-
-        select(query);
-
-        ArrayList memberClaims = new ArrayList<>(resultList());
-
-        return memberClaims;
-    }
-
+//    public ArrayList listMemberClaims(String memId) throws SQLException {
+//
+//        String query = "SELECT * from Claims where mem_id='" + memId + "'";
+//
+//        select(query);
+//
+//        ArrayList memberClaims = new ArrayList<>(resultList());
+//
+//        return memberClaims;
+//    }
     public float calcMembershipFee() {
 
         String query = "SELECT * from Claims";
@@ -494,12 +528,12 @@ public class JDBC1 {
 
     public String authLogin(String user, String pass) {
 
-        String query = "select * from users where id='" + user+"'";
+        String query = "select * from users where id='" + user + "'";
 
         String authKey = null;
-        
+
         select(query);
-        
+
         try {
             while (result.next()) {
                 String pswd = result.getString("password");
@@ -517,5 +551,25 @@ public class JDBC1 {
         }
 
         return authKey;
+    }
+
+    public String doList(String lookUp, String where) {
+
+        String resultTbl = null;
+        String query = null;
+
+        if (where.equals("*")) {
+            query = "SELECT * from " + lookUp;
+        } else {
+            query = "SELECT * from " + lookUp + " WHERE " + where + "";
+        }
+
+        select(query);
+        try {
+            resultTbl = resultTable(resultList());
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return resultTbl;
     }
 }
