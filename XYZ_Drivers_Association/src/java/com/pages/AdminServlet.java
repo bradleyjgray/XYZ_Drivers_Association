@@ -115,7 +115,7 @@ public class AdminServlet extends HttpServlet {
                     String upgraded = null;
 
                     user = (String) request.getParameter("username");
-                    upgraded = jdbc.appliedToMember(user);
+                    upgraded = user + jdbc.appliedToMember(user);
                     memberList = jdbc.doList("Members", "*");
 
                     request.setAttribute("message", upgraded);
@@ -125,6 +125,17 @@ public class AdminServlet extends HttpServlet {
                     view.forward(request, response);
                     break;
                 case "suspendMember":
+                    String suspended = null;
+
+                    user = (String) request.getParameter("username");
+                    suspended = user + jdbc.suspendMember(user);
+                    memberList = jdbc.doList("Members", "*");
+
+                    request.setAttribute("message", suspended);
+
+                    request.setAttribute("messageList", memberList);
+                    view = request.getRequestDispatcher("results.jsp");
+                    view.forward(request, response);
                     break;
                 case "resumeMember":
                     break;

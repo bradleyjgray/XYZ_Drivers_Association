@@ -298,7 +298,7 @@ public class JDBC1 {
             System.out.println("USER SUSPENDED!");
         } catch (SQLException e) {
             System.out.println("FAILED TO SUSPEND USER");
-            return "MEMBERSHIP SUSPEND FAILED!";
+            return " :: MEMBERSHIP SUSPEND FAILED!";
         }
         return " SUSPENDED";
     }

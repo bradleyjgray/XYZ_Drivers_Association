@@ -23,16 +23,23 @@
                 <button name="request" type="submit" value="AcceptClaim">Accept</button>
                 <button name="request" type="submit" value="RejectClaim">Reject</button>
         </form>
-                <%
-            String message = (String)request.getAttribute("message");
-            String messageList = (String)request.getAttribute("messageList");
-            
-            
-            if (message != null){
-            out.println("<p><font color=red>Database Response:: " + message + "</p></font>");
+        <p> Toggle List: </p>
+        <form action="AdminServlet">
+            <center>
+                <button name="request" type="submit" value="listClaims"> All Claims </button>
+                <button name="request" type="submit" value="unrespondedClaims"> Outstanding Claims </button>
+            </center>
+        </form>       
+
+        <%
+            String message = (String) request.getAttribute("message");
+            String messageList = (String) request.getAttribute("messageList");
+
+            if (message != null) {
+                out.println("<p><font color=red>Database Response:: " + message + "</p></font>");
             }
-            out.println("<br/><br/>Claim List: " + messageList);
+            out.println("Claim List: " + messageList);
         %>
     </center>
-    </body>
+</body>
 </html>

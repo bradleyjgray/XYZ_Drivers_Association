@@ -21,15 +21,27 @@
                 <p>
             </form>       
         </div>
+        <div class ="container">
+                   <center>
+                       <p> Toggle List: </p>
+                       <form action="AdminServlet">
+                       <button action="AdminServlet" name="request" type="submit" value="listMembers"> All Members </button>
+                       <button action="AdminServlet" name="request" type="submit" value="listApplications"> Member Applications </button>
+                       <button action="AdminServlet" name="request" type="submit" value="listBalances"> Outstanding Balances </button>
+                       </form>
+                   </center>
+            
+            
+        </div>
 
         <%
             String genResult = (String) request.getAttribute("message");
             String genTable = (String) request.getAttribute("messageList");
             
             if (genResult != null){
-            out.print("<font color=red>Database Message: <br/><br/>" + genTable + "</font>");
+            out.print("<p><font color=red>Database Message: " + genResult + "</font></p>");
             }
-            out.print("<br/><br/>Database List: <br/><br/>" + genTable);
+            out.print("Database List: <br/><br/>" + genTable);
         %>
     </center>
 </body>
