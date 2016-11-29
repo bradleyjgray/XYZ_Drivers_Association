@@ -62,7 +62,7 @@ public class LoginServlet extends HttpServlet {
 
             if (authKey.equals("APPLIED") || authKey.equals("MEMBER") || authKey.equals("ADMIN")) {
                 session.setAttribute(username, username);
-                session.setAttribute(username, authKey);
+                session.setAttribute("authKey", authKey);
                 //set session to expire in 20 minutes
                 session.setMaxInactiveInterval(20 * 60);
                 Cookie user = new Cookie("user", username);

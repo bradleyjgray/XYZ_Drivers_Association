@@ -8,6 +8,9 @@ package com.pages;
 import com.model.JDBC1;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,6 +44,13 @@ public class RegisterServlet extends HttpServlet {
             
             String nameResult = jdbc.genUsr(name);
             String passResult = jdbc.genPass(dob);
+            
+            try {
+                jdbc.createMember(nameResult, name, addr, dob, "APPLIED");
+                jdbc.addUsr(nameResult, passResult);
+            } catch (SQLException ex) {
+                Logger.getLogger(RegisterServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
             request.setAttribute("genName", nameResult);
             request.setAttribute("genPass", passResult);

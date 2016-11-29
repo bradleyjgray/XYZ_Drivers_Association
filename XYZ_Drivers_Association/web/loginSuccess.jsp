@@ -15,11 +15,12 @@
         <h1><%
 
 //allow access only if session exists
+
             String user = (String) session.getAttribute("username");
             String userName = null;
             String sessionID = null;
-            String authKey = (String) session.getAttribute("authKey");
-
+            String key = (String) session.getAttribute("authKey");
+            
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
@@ -31,6 +32,13 @@
                     }
                 }
             }
+            if (key.equals("APPLIED") || key.equals("MEMBER")){
+                response.sendRedirect("/Members/membersDashboard.jsp");
+            }
+            else {
+                response.sendRedirect("AdminDashboard.html");
+            }
+
             %></h1>
     </body>
 </html>

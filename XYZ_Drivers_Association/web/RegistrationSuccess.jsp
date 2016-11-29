@@ -4,6 +4,8 @@
     Author     : bgray
 --%>
 
+<%@ page import="java.util.*" %>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -13,6 +15,14 @@
     </head>
     <body>
         <h1>Registration Successful!</h1>
+        
+        <%
+            String genName = (String)request.getAttribute("genName");
+            String genPass = (String)request.getAttribute("genPass");
+            
+            out.print("Username: %s", genName);
+            out.print(" Password: %s", genPass);
+        %>
         
         <form action="login.html">
             <input type="submit" value="Return to Login" />

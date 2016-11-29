@@ -239,7 +239,8 @@ public class JDBC1 {
         Date dob = new Date();
 
         String dateReg;
-        balance += membershipFee;
+
+        balance = setMemberFee(10);
 
         try {
             dateReg = dateFormat.format(dor);
