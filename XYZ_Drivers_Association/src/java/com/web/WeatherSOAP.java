@@ -11,12 +11,6 @@ import javax.xml.transform.stream.*;
  * @author Marco Moreira
  */
 public class WeatherSOAP {
-   
-   static String xmlString;
-   
-    public String testXML(){
-        return xmlString;
-    }
     
     static public void weather(){
             try {
