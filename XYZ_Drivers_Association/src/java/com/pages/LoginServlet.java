@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.model.JDBC1;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
