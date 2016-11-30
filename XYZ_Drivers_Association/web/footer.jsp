@@ -13,7 +13,8 @@
     com.web.WeatherSOAP.weather();
     com.web.WeatherSOAP.XMLread();
     String footerc = (com.web.WeatherSOAP.cloud);
+    int celsius = (com.web.WeatherSOAP.celsius);
 %>
 
-<p align="center"><font face="verdana"> Date: <%= date %> | Time: <%= time%> <%= zone %></font></p>
-<p align="center"><font face="verdana"> Current Weather: <%= footerc %>
+<p align="center"><font face="verdana"> Date: <%= date %> | Time: <%= time %> <%= zone %></font></p>
+<p align="center"><font face="verdana"> Current Weather: <%= celsius %>°C with <%= footerc %></font></p>
