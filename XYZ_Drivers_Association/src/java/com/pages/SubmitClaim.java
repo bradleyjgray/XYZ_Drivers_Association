@@ -12,9 +12,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +22,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author bgray
  */
-public class MembersServlet extends HttpServlet {
+public class SubmitClaim extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,38 +37,25 @@ public class MembersServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
-        
-        JDBC1 jdbc = new JDBC1();
-        
-        String cmd = request.getParameter("request");
-        
-        RequestDispatcher view;
-        
-        try {
-            jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
-        } catch (SQLException ex) {
-            Logger.getLogger(MembersServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        session.setAttribute("dbConn", jdbc);
-
-        if ((Connection) request.getServletContext().getAttribute("connection") == null) {
-            request.getRequestDispatcher("/WEB-INF/conErr.jsp").forward(request, response);
-        } 
-        else
-        {
-            switch(cmd) {
-                case "checkStatus":
-                    view = request.getRequestDispatcher("StatusServlet");
-                    view.forward(request, response);   
-                    break;
-                case "makeClaim":
-                    view = request.getRequestDispatcher("MakeClaim.jsp");
-                    view.forward(request, response); 
-                    break;
-                case "makePayment":
-                    break;
+            
+            JDBC1 jdbc = new JDBC1();
+            
+            try {
+                jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
+            } catch (SQLException ex) {
+                Logger.getLogger(RegisterServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+            session.setAttribute("dbConn", jdbc);
+            
+            if ((Connection) request.getServletContext().getAttribute("connection") == null) {
+            request.getRequestDispatcher("/WEB-INF/conErr.jsp").forward(request, response);
+            } 
+            else 
+            {
+                String date = (String)request.getAttribute("date");
+                String description = (String)request.getAttribute("description");
+                String amount = (String)request.getAttribute("amount");
+            }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -45,7 +45,9 @@ public class StatusServlet extends HttpServlet {
         RequestDispatcher view;
         
         String userName = null;
-            
+        String selectString = "name,status,balance";
+        String claimString = "id,date,rationale,status,amount";
+        
         Cookie[] cookies = request.getCookies();
             
         for (Cookie cookie : cookies) {
@@ -66,7 +68,8 @@ public class StatusServlet extends HttpServlet {
         } 
         else
         {
-            request.setAttribute("claimCount", jdbc.claimCounter(userName));
+            request.setAttribute("claims", jdbc.getClaimsForUser(userName, claimString));
+            request.setAttribute("memberInfo", jdbc.getInfoForUser(userName, selectString));
             
             view = request.getRequestDispatcher("CheckStatus.jsp");
             

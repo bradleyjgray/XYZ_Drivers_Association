@@ -61,6 +61,10 @@
         <servlet-name>StatusServlet</servlet-name>
         <servlet-class>com.pages.StatusServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>SubmitClaim</servlet-name>
+        <servlet-class>com.pages.SubmitClaim</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/doLogin</url-pattern>
@@ -88,6 +92,10 @@
     <servlet-mapping>
         <servlet-name>StatusServlet</servlet-name>
         <url-pattern>/StatusServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SubmitClaim</servlet-name>
+        <url-pattern>/SubmitClaim</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

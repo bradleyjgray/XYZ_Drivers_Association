@@ -14,7 +14,7 @@
         <title>Registration</title>
     </head>
     <body>
-        <h1>Registration Successful!</h1>
+        <h1 style="font-size:300%;">Registration Successful!</h1>
         <p>
         <%
             String genName = (String)request.getAttribute("genName");

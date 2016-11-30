@@ -21,8 +21,9 @@
                     userName = cookie.getValue();
                 }
             }
-            
-            out.print("Welcome " + userName);
+            out.print("<center>");
+            out.print("<h2 style=\"font-size:150%;\">Welcome " + userName + "</h2>");
+            out.print("</center>");
         %>
         
         <table width="50%">

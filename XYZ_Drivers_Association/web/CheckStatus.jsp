@@ -12,6 +12,24 @@
         <title>Member Status</title>
     </head>
     <body>
-        <h1>Current Member Status</h1>
+        <center>
+            <h1 style="font-size:300%;">Member Status</h1>
+        
+            <%
+                String memberInfo = (String)request.getAttribute("memberInfo");
+                String claim = (String)request.getAttribute("claims");
+            
+                out.print("<h2 style=\"font-size:150%;\">Info</h2>");
+                out.print(memberInfo);
+                out.print("<br />");
+                out.print("<h2 style=\"font-size:150%;\">Claims</h2>");
+                out.print(claim);
+                out.print("<br />");
+            %>
+            
+            <form action="membersDashboard.jsp">
+                <input type="submit" value="Return to Dashboard" />
+            </form>
+        </center>
     </body>
 </html>

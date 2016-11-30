@@ -72,6 +72,40 @@ public class JDBC1 {
         }
     }
     
+    public String getInfoForUser(String userID, String select) {
+
+        String resultTbl = null;
+        String query = null;
+
+        query = "SELECT " + select + " FROM Members WHERE id='" + userID + "'";
+       
+        select(query);
+        
+        try {
+            resultTbl = resultTable(resultList());
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return resultTbl;
+    }
+    
+    public String getClaimsForUser(String userID, String select) {
+
+        String resultTbl = null;
+        String query = null;
+
+        query = "SELECT " + select + " FROM Claims WHERE mem_id='" + userID + "'";
+       
+        select(query);
+        
+        try {
+            resultTbl = resultTable(resultList());
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return resultTbl;
+    }
+    
     public int claimCounter(String userID) {
         int count = 0;
         
