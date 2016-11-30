@@ -841,6 +841,7 @@ public class JDBC1 {
                     String status = result.getString("status");
                     if (pass.equals(pswd)) {
                         authKey = status;
+                        checkMemberFee(user);
                     } else {
                         authKey = "failed";
                     }
@@ -873,4 +874,48 @@ public class JDBC1 {
         return resultTbl;
     }
 
+    public boolean checkMemberFee(String memId) throws SQLException {
+
+        int yearMember = 1;
+        String query = "SELECT * from Members where id='" + memId + "'";
+        float balance = 0;
+        String memStatus = null;
+
+        Date today = new Date();
+        Date dor = null;
+        Calendar calToday = new GregorianCalendar();
+        Calendar calDor = new GregorianCalendar();
+
+        select(query);
+
+        while (result.next()) {
+            dor = result.getDate("dor");
+            balance = result.getFloat("balance");
+            memStatus = result.getString("status");
+
+        }
+
+        calToday.setTime(today);
+        calDor.setTime(dor);
+
+        if (memStatus.equals("APPROVED")) {
+            if ((calToday.get(Calendar.YEAR) - calDor.get(Calendar.YEAR) >= yearMember)
+                    && (calToday.get(Calendar.MONTH) >= calDor.get(Calendar.MONTH))) {
+                yearMember++;
+                PreparedStatement ps = null;
+
+                ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                ps.setFloat(1, balance + 10.00f);
+                ps.setString(2, memId);
+                ps.executeUpdate();
+
+                ps.close();
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
 }
