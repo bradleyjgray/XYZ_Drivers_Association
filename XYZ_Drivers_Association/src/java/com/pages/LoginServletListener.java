@@ -18,6 +18,12 @@ import javax.servlet.ServletContext;
  *
  * @author: Luke James
  */
+    /**
+     * SERVLET: SERVLET LISTENER 
+     * ROLE: LISTEN TO EVENTS IN THE CONTAINER 
+     * INCLUDES: ASSISTS IN ESTABLISHING CONNECTION TO THE DATABASE
+     *
+     */
 @WebListener()
 public class LoginServletListener implements ServletContextListener {
 
