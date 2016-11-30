@@ -895,10 +895,9 @@ public class JDBC1 {
 
         }
 
-        calToday.setTime(today);
-        calDor.setTime(dor);
-
         if (memStatus.equals("APPROVED")) {
+            calToday.setTime(today);
+            calDor.setTime(dor);
             if ((calToday.get(Calendar.YEAR) - calDor.get(Calendar.YEAR) >= yearMember)
                     && (calToday.get(Calendar.MONTH) >= calDor.get(Calendar.MONTH))) {
                 yearMember++;
