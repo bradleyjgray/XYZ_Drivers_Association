@@ -32,7 +32,7 @@
                     }
                 }
             }
-            if (key.equals("APPLIED") || key.equals("APPROVED")){
+            if (key.equals("APPLIED") || key.equals("APPROVED") || key.equals("SUSPENDED")){
                 response.sendRedirect("membersDashboard.jsp");
             }
             else {

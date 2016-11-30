@@ -31,6 +31,10 @@
                 <button type="submit">Submit</button>
                 </p>
             </form>
+            
+            <form action="membersDashboard.jsp">
+                <input type="submit" value="Return to Dashboard" />
+            </form>
         </div>
     </body>
 </html>

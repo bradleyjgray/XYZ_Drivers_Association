@@ -59,7 +59,8 @@ public class LoginServlet extends HttpServlet {
 
             String authKey = jdbc.authLogin(username, password);
             
-            if (authKey.equals("APPLIED") || authKey.equals("APPROVED") || authKey.equals("ADMIN")) {
+            if (authKey.equals("APPLIED") || authKey.equals("APPROVED") || authKey.equals("ADMIN") 
+                    || authKey.equals("SUSPENDED")) {
 
                 session.setAttribute(username, username);
                 session.setAttribute("authKey", authKey);

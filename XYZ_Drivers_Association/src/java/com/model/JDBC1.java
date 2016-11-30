@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Random;
 
 /**
@@ -72,16 +73,16 @@ public class JDBC1 {
             System.out.println("err" + e);
         }
     }
-    
+
     public String getInfoForUser(String userID, String select) {
 
         String resultTbl = null;
         String query = null;
 
         query = "SELECT " + select + " FROM Members WHERE id='" + userID + "'";
-       
+
         select(query);
-        
+
         try {
             resultTbl = resultTable(resultList());
         } catch (SQLException ex) {
@@ -89,16 +90,16 @@ public class JDBC1 {
         }
         return resultTbl;
     }
-    
+
     public String getClaimsForUser(String userID, String select) {
 
         String resultTbl = null;
         String query = null;
 
         query = "SELECT " + select + " FROM Claims WHERE mem_id='" + userID + "'";
-       
+
         select(query);
-        
+
         try {
             resultTbl = resultTable(resultList());
         } catch (SQLException ex) {
@@ -106,7 +107,7 @@ public class JDBC1 {
         }
         return resultTbl;
     }
-    
+
     public int claimCounter(String userID) {
         int count = 0;
 
@@ -384,79 +385,91 @@ public class JDBC1 {
 
         return " IS NOW AN APPROVED MEMBER.";
     }
-    
+
     public String getPaymentID(String id) {
         String payments = "";
-        
+
         String query = "SELECT id from payments WHERE mem_id='" + id + "'";
-        
+
         select(query);
-        
+
         try {
             while (result.next()) {
-                String paymentID = (String)result.getString("id");
-                
+                String paymentID = (String) result.getString("id");
+
                 payments = payments + paymentID + "-";
             }
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if(result == null) {
+
+        if (result == null) {
             payments = "1";
         }
-        
+
         return payments;
     }
-    
-    public void updateBalance(String paymentID, String id) {
+
+    public String updateBalance(float paymentAmount, String id) throws SQLException {
         String paymentQuery = "SELECT amount FROM payments WHERE mem_id='" + id + "'";
-        String balanceQuery = "SELECT balance FROM Members WHERE mem_id='" + id + "'";
-        
-        select(paymentQuery);
-        
-        float paymentAmount = 0;
+        String balanceQuery = "SELECT balance FROM Members WHERE id='" + id + "'";
+
+        //select(paymentQuery);
         float balanceAmount = 0;
-        
-        try {
-            while (result.next()) {
-                paymentAmount = (float)result.getFloat("amount");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+
+//        try {
+//            while (result.next()) {
+//                paymentAmount = (float)result.getFloat("amount");
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         select(balanceQuery);
-        
+
         try {
             while (result.next()) {
-                balanceAmount = (float)result.getFloat("amount");
+                balanceAmount = result.getFloat("balance");
             }
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        float remainingBalance = 0;
-        
-        if(paymentAmount > balanceAmount) {
-            remainingBalance = 0;
+
+        //float remainingBalance = 0;
+//        if(paymentAmount > balanceAmount) {
+//            remainingBalance = 0;
+//        }
+//        else
+//        {
+//            remainingBalance = balanceAmount - paymentAmount;
+//        }
+        //String updateBalanceQuery = "UPDATE Members SET balance=" + remainingBalance + "WHERE id='" + id + "'";
+        PreparedStatement ps = null;
+        if (paymentAmount <= balanceAmount) {
+            try {
+                ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                ps.setFloat(1, balanceAmount - paymentAmount);
+                ps.setString(2, id);
+                ps.executeUpdate();
+
+                ps.close();
+                return " payment complete!";
+            } catch (SQLException e) {
+                System.out.println("UPDATE FAILED! " + e);
+            }
+        } else {
+            return " payment too large!  Please enter a smaller payment amount!";
         }
-        else
-        {
-            remainingBalance = balanceAmount - paymentAmount;
-        }
-        
-        String updateBalanceQuery = "UPDATE Members SET balance=" + remainingBalance + "WHERE id='" + id + "'";
-        
-        try {
-            statement = connection.createStatement();
-            statement.executeUpdate(updateBalanceQuery);
-        } catch (SQLException e) {
-            System.out.println("UPDATE FAILED: " + e);
-        }
+
+//        try {
+//            statement = connection.createStatement();
+//            statement.executeUpdate(updateBalanceQuery);
+//        } catch (SQLException e) {
+//            System.out.println("UPDATE FAILED: " + e);
+//        }
+        return "PAYMENT ERROR!";
     }
 
-    public void makePayment(String id, String memId, float amount, String payType) {
+    public void makePayment(String memId, float amount, String payType) {
 
         //paytype: EITHER BALANCE (Balance) or MEMBERSHIP (Membership)
         PreparedStatement pStatement = null;
@@ -472,18 +485,18 @@ public class JDBC1 {
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         java.sql.Date sqlDOP = new java.sql.Date(today.getTime());
 
         try {
-            pStatement = connection.prepareStatement("insert into payments (amount, date, id, mem_id, type_of_payment) values (?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setFloat(1, amount);
-            pStatement.setDate(2, (java.sql.Date) sqlDOP);
-            pStatement.setString(3, id);
-            pStatement.setString(4, memId);
-            pStatement.setString(5, payType);
+            pStatement = connection.prepareStatement("INSERT INTO payments (mem_id, type_of_payment, amount, date) VALUES (?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, memId);
+            pStatement.setString(2, payType);
+            pStatement.setFloat(3, amount);
+            pStatement.setDate(4, (java.sql.Date) sqlDOP);
+
             pStatement.executeUpdate();
-            
+
             pStatement.close();
             System.out.println("1 line added.");
         } catch (SQLException ex) {
@@ -615,78 +628,94 @@ public class JDBC1 {
         }
         return "CLAIM " + response;
     }
-    
+
     public String getClaimsID(String id) {
         String claims = "";
-        
+
         String query = "SELECT id from Claims WHERE mem_id='" + id + "'";
-        
+
         select(query);
-        
+
         try {
             while (result.next()) {
-                String claimsID = (String)result.getString("id");
-                
+                String claimsID = (String) result.getString("id");
+
                 claims = claims + claimsID + "-";
             }
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if(result == null) {
+
+        if (result == null) {
             claims = "1";
         }
-        
+
         return claims;
     }
 
-    public void makeClaim(String id, String memId, String rationale, float amount) {
+    public String makeClaim(String memId, String rationale, float amount) throws SQLException {
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date today = new Date();
+        String query = "Select * from Members where id='" + memId + "'";
+        String memStatus = null;
 
-        String status = "PENDING";
-        
-        PreparedStatement pStatement = null;
+        Date doc = new Date();
+        Calendar cal = new GregorianCalendar();
 
-        String dateClaim;
-        
-        try {
-            dateClaim = dateFormat.format(today);
-            today = dateFormat.parse(dateClaim);
-        } catch (ParseException ex) {
-            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        select(query);
+
+        while (result.next()) {
+            memStatus = result.getString("status");
+            cal.setTime(result.getDate("dor"));
         }
-        
-        java.sql.Date sqlDOC = new java.sql.Date(today.getTime());
 
-        try {
-            pStatement = connection.prepareStatement("INSERT INTO Claims (id,mem_id,date,rationale,status,amount) VALUES (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(1, id);
-            pStatement.setString(2, memId);
-            pStatement.setDate(3, (java.sql.Date) sqlDOC);
-            pStatement.setString(4, rationale);
-            pStatement.setString(5, status);
-            pStatement.setFloat(6, amount);
-            pStatement.executeUpdate();
-            
-            pStatement.close();
-            System.out.println("1 line added.");
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        cal.add(Calendar.MONTH, 6);
+
+        if (memStatus.equals("APPROVED")) {
+            if (doc.after(cal.getTime())) {
+
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date today = new Date();
+
+                String status = "PENDING";
+
+                PreparedStatement pStatement = null;
+
+                String dateClaim;
+
+                try {
+                    dateClaim = dateFormat.format(today);
+                    today = dateFormat.parse(dateClaim);
+                } catch (ParseException ex) {
+                    Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                java.sql.Date sqlDOC = new java.sql.Date(today.getTime());
+
+                try {
+                    pStatement = connection.prepareStatement("INSERT INTO Claims (mem_id,date,rationale,status,amount) VALUES (?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                    pStatement.setString(1, memId);
+                    pStatement.setDate(2, (java.sql.Date) sqlDOC);
+                    pStatement.setString(3, rationale);
+                    pStatement.setString(4, status);
+                    pStatement.setFloat(5, amount);
+                    pStatement.executeUpdate();
+
+                    pStatement.close();
+                    System.out.println("1 line added.");
+                    return " CLAIM SUBMITTED FOR APPROVAL!";
+                } catch (SQLException ex) {
+                    Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                return " YOU NEED TO BE A FULL MEMBER FOR 6 MONTHS TO MAKE A CLAIM!";
+            }
+        } else {
+
+            return " YOU NEED TO BE A FULL MEMBER TO MAKE A CLAIM!";
         }
+        return " CLAIM FAILED!";
     }
 
-//    public ArrayList listMemberClaims(String memId) throws SQLException {
-//
-//        String query = "SELECT * from Claims where mem_id='" + memId + "'";
-//
-//        select(query);
-//
-//        ArrayList memberClaims = new ArrayList<>(resultList());
-//
-//        return memberClaims;
-//    }
     public String calcMembershipFee() {
 
         String query = "SELECT * from Claims where status='ACCEPTED'";
@@ -775,19 +804,22 @@ public class JDBC1 {
             try {
                 float balance = result.getFloat("balance");
                 String id = result.getString("id");
-                PreparedStatement ps = null;
+                String memStatus = result.getString("status");
+                if (memStatus.equals("APPROVED")) {
+                    PreparedStatement ps = null;
 
-                ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-                ps.setFloat(1, balance + membershipFee);
-                ps.setString(2, id);
-                ps.executeUpdate();
+                    ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                    ps.setFloat(1, balance + membershipFee);
+                    ps.setString(2, id);
+                    ps.executeUpdate();
 
-                ps.close();
+                    ps.close();
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return " BALANCE UPDATE SUCCESS :: " + membershipFee + " ADDED TO ALL BALANCES!";
+        return " BALANCE UPDATE SUCCESS :: " + membershipFee + " ADDED TO ALL (FULL) MEMBER BALANCES!";
     }
 
     public String authLogin(String user, String pass) throws SQLException {

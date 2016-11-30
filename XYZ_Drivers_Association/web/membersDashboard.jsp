@@ -10,12 +10,14 @@
 
     <center>
         <h1 style="font-size:300%;">Members Dashboard</h1>
-        
+
         <%
             String userName = null;
-            
+
+            String result = (String) request.getAttribute("result");
+
             Cookie[] cookies = request.getCookies();
-            
+
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("user")) {
                     userName = cookie.getValue();
@@ -23,17 +25,22 @@
             }
             out.print("<center>");
             out.print("<h2 style=\"font-size:150%;\">Welcome " + userName + "</h2>");
+            if (result != null) {
+                out.print("<br/> <font color=red>DB RESPONSE :: " + result + "</font><br/>");
+            }
             out.print("</center>");
         %>
-        
+
         <table width="50%">
             <tbody>
                 <tr>
                     <td><form action="MembersServlet"><center><button name="request" type="submit" value="checkStatus">Check Status</button></center></form></td>
 
                     <td><form action="MembersServlet"><center><button name="request" type="submit" value="makeClaim">Make a Claim</button></center></form></td>
-                    
+
                     <td><form action="MembersServlet"><center><button name="request" type="submit" value="makePayment">Make a Payment</button></center></form></td>
+                    
+                    <td><form action="logout"><center><button name="request" type="submit" value="Logout">Logout</button></center></td>
                 </tr>
             </tbody>
         </table>

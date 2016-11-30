@@ -41,7 +41,8 @@ public class ProcessPayment extends HttpServlet {
         HttpSession session = request.getSession();
             
         JDBC1 jdbc = new JDBC1();
-            
+        
+        String result = null;    
         String userName = null;
             
         Cookie[] cookies = request.getCookies();
@@ -65,50 +66,43 @@ public class ProcessPayment extends HttpServlet {
         else 
         {
             float amount = Float.parseFloat(request.getParameter("amount"));
-            String paymentType = request.getParameter("paymentType");
             
-            String paymentsID = jdbc.getPaymentID(userName);
+            String paymentType = null;
             
-            String[] separatePayments = paymentsID.split("-");
-            String nextID = "";
-            
-            if(separatePayments[0].equals("") || separatePayments[0].equals("0")) {
-                nextID = "1";
-            }
-            else
-            {
-               nextID = calculateNextPaymentID(separatePayments); 
+            if (amount == 10.00f){
+            paymentType = "MEMBERSHIP";
+            } else {
+            paymentType = "BALANCE";
             }
             
-            jdbc.makePayment(nextID, userName, amount, paymentType);
+//            String paymentsID = jdbc.getPaymentID(userName);
+//            
+//            String[] separatePayments = paymentsID.split("-");
+//            String nextID = "";
+//            
+//            if(separatePayments[0].equals("") || separatePayments[0].equals("0")) {
+//                nextID = "1";
+//            }
+//            else
+//            {
+//               nextID = calculateNextPaymentID(separatePayments); 
+//            }
+//            
+            jdbc.makePayment(userName, amount, paymentType);
             
-            jdbc.updateBalance(nextID, userName);
+            try {
+                result = jdbc.updateBalance(amount, userName);
+            } catch (SQLException ex) {
+                Logger.getLogger(ProcessPayment.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
             RequestDispatcher view = request.getRequestDispatcher("membersDashboard.jsp");
+            
+            request.setAttribute("result", result);
                 
             view.forward(request, response);
         }
     }
-    
-    private String calculateNextPaymentID(String[] paymentArray) {
-        String nextClaimID = "";
-        
-        int greatestValue = 0;
-        int currentValue = 0;
-        
-        for(int i = 0; i < paymentArray.length; i++) {
-            currentValue = Integer.parseInt(paymentArray[i]);
-            
-            if(currentValue > greatestValue) {
-                greatestValue = currentValue;
-            }
-        }
-        
-        nextClaimID = Integer.toString(greatestValue + 1);
-        
-        return nextClaimID;
-    }
-
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

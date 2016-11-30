@@ -68,6 +68,8 @@ public class StatusServlet extends HttpServlet {
         } 
         else
         {
+            
+            
             request.setAttribute("claims", jdbc.getClaimsForUser(userName, claimString));
             request.setAttribute("memberInfo", jdbc.getInfoForUser(userName, selectString));
             

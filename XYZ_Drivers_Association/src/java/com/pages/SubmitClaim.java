@@ -36,74 +36,59 @@ public class SubmitClaim extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
-            
-            JDBC1 jdbc = new JDBC1();
-            
-            String userName = null;
-            
-            Cookie[] cookies = request.getCookies();
-            
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("user")) {
-                    userName = cookie.getValue();
-                }
+
+        JDBC1 jdbc = new JDBC1();
+
+        String userName = null;
+
+        Cookie[] cookies = request.getCookies();
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("user")) {
+                userName = cookie.getValue();
             }
-            
-            try {
-                jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
-            } catch (SQLException ex) {
-                Logger.getLogger(RegisterServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            session.setAttribute("dbConn", jdbc);
-            
-            if ((Connection) request.getServletContext().getAttribute("connection") == null) {
+        }
+
+        try {
+            jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
+        } catch (SQLException ex) {
+            Logger.getLogger(RegisterServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        session.setAttribute("dbConn", jdbc);
+
+        if ((Connection) request.getServletContext().getAttribute("connection") == null) {
             request.getRequestDispatcher("/WEB-INF/conErr.jsp").forward(request, response);
-            } 
-            else 
-            {
-                String description = request.getParameter("description");
-                float amount = Float.parseFloat(request.getParameter("amount"));
-                
-                String claimsID = jdbc.getClaimsID(userName);
-                
-                String[] separateClaims = claimsID.split("-");
-                String nextID = "";
-                
-                if(separateClaims[0].equals("") || separateClaims[0].equals("0")) {
-                    nextID = "1";
-                }
-                else
-                {
-                    nextID = calculateNextClaimID(separateClaims);
-                }
-                
-                jdbc.makeClaim(nextID, userName, description, amount);
-                
-                RequestDispatcher view = request.getRequestDispatcher("membersDashboard.jsp");
-                
-                view.forward(request, response);
-            }
+        } else {
+            String description = request.getParameter("description");
+            float amount = Float.parseFloat(request.getParameter("amount"));
+
+            String result = jdbc.makeClaim(userName, description, amount);
+
+            RequestDispatcher view = request.getRequestDispatcher("membersDashboard.jsp");
+            request.setAttribute("result", result);
+            view.forward(request, response);
+        }
     }
-    
+
     private String calculateNextClaimID(String[] claimArray) {
         String nextClaimID = "";
-        
+
         int greatestValue = 0;
         int currentValue = 0;
-        
-        for(int i = 0; i < claimArray.length; i++) {
+
+        for (int i = 0; i < claimArray.length; i++) {
             currentValue = Integer.parseInt(claimArray[i]);
-            
-            if(currentValue > greatestValue) {
+
+            if (currentValue > greatestValue) {
                 greatestValue = currentValue;
             }
         }
-        
+
         nextClaimID = Integer.toString(greatestValue + 1);
-        
+
         return nextClaimID;
     }
 
@@ -119,7 +104,11 @@ public class SubmitClaim extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(SubmitClaim.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -133,7 +122,11 @@ public class SubmitClaim extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(SubmitClaim.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
