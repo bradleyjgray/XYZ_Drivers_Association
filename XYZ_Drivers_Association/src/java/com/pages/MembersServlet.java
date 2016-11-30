@@ -38,14 +38,18 @@ public class MembersServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        //Create HTTP session
         HttpSession session = request.getSession();
         
+        //Create instance of JDBC
         JDBC1 jdbc = new JDBC1();
         
+        //Create a command for which function is chosen
         String cmd = request.getParameter("request");
         
         RequestDispatcher view;
         
+        //Try to connect to database, if connection cannot be made then throw exception
         try {
             jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
         } catch (SQLException ex) {
@@ -59,14 +63,17 @@ public class MembersServlet extends HttpServlet {
         else
         {
             switch(cmd) {
+                //If cmd checkStatus, then forward to StatusServlet to view member status
                 case "checkStatus":
                     view = request.getRequestDispatcher("StatusServlet");
                     view.forward(request, response);   
                     break;
+                //If cmd makeClaim, then forward to MakeClaim jsp to fill out claim form
                 case "makeClaim":
                     view = request.getRequestDispatcher("MakeClaim.jsp");
                     view.forward(request, response); 
                     break;
+                //If cmd makePayment, then forward to PaymentForm jsp to make a payment
                 case "makePayment":
                     view = request.getRequestDispatcher("PaymentForm.jsp");
                     view.forward(request, response); 
