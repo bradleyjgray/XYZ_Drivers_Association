@@ -54,14 +54,14 @@ public class WeatherSOAP {
         TransformerFactory transformerF = TransformerFactory.newInstance();
         Transformer transformer = transformerF.newTransformer();
         Source sourceC = soapResponse.getSOAPPart().getContent();
-        StreamResult result = new StreamResult(new File("/weather.xml"));
+        StreamResult result = new StreamResult(new File("weather.xml"));
         transformer.transform(sourceC, result);
     }
 
     static public void XMLread() {
         try {
 
-            File fXmlFile = new File("/weather.xml");
+            File fXmlFile = new File("weather.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
