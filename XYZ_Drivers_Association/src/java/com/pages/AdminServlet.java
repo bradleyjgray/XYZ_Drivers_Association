@@ -115,7 +115,7 @@ public class AdminServlet extends HttpServlet {
                     String upgraded = null;
 
                     user = (String) request.getParameter("username");
-                    upgraded = jdbc.appliedToMember(user);
+                    upgraded = user + jdbc.appliedToMember(user);
                     memberList = jdbc.doList("Members", "*");
 
                     request.setAttribute("message", upgraded);
@@ -125,10 +125,53 @@ public class AdminServlet extends HttpServlet {
                     view.forward(request, response);
                     break;
                 case "suspendMember":
-                    break;
-                case "resumeMember":
+                    String suspended = null;
+
+                    user = (String) request.getParameter("username");
+                    suspended = user + jdbc.suspendMember(user);
+                    memberList = jdbc.doList("Members", "*");
+
+                    request.setAttribute("message", suspended);
+                    request.setAttribute("messageList", memberList);
+                    view = request.getRequestDispatcher("results.jsp");
+                    view.forward(request, response);
                     break;
                 case "reportTurnover":
+                    result = null;
+                    
+                    result = jdbc.calcMembershipFee();
+                    
+                    String[] financials = result.split(",");
+                    String claims = financials[0];
+                    String members = financials[1];
+                    String fee = financials[2];
+                    String income = financials[3];
+                    
+                    request.setAttribute("memberCount", members);
+                    request.setAttribute("claimTotal", claims);
+                    request.setAttribute("reccCharge", fee);
+                    request.setAttribute("totalIncome", income);
+                    view = request.getRequestDispatcher("FinancialReports.jsp");
+                    view.forward(request, response);
+                    break;
+                case "chargeMembers":
+                    result = jdbc.calcMembershipFee();
+                    String resultCharge = jdbc.chargeMembers();
+                    
+                    financials = result.split(",");
+                    claims = financials[0];
+                    members = financials[1];
+                    fee = financials[2];
+                    income = financials[3];
+                    
+                    request.setAttribute("memberCount", members);
+                    request.setAttribute("claimTotal", claims);
+                    request.setAttribute("reccCharge", fee);
+                    request.setAttribute("totalIncome", income);
+                    
+                    request.setAttribute("chargeResult", resultCharge);
+                    view = request.getRequestDispatcher("FinancialReports.jsp");
+                    view.forward(request, response);
                     break;
                 default:
                     break;

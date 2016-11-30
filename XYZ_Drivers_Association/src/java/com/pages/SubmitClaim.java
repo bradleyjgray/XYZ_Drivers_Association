@@ -12,7 +12,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +42,16 @@ public class SubmitClaim extends HttpServlet {
             
             JDBC1 jdbc = new JDBC1();
             
+            String userName = null;
+            
+            Cookie[] cookies = request.getCookies();
+            
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("user")) {
+                    userName = cookie.getValue();
+                }
+            }
+            
             try {
                 jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
             } catch (SQLException ex) {
@@ -52,10 +64,40 @@ public class SubmitClaim extends HttpServlet {
             } 
             else 
             {
-                String date = (String)request.getAttribute("date");
-                String description = (String)request.getAttribute("description");
-                String amount = (String)request.getAttribute("amount");
+                String description = request.getParameter("description");
+                float amount = Float.parseFloat(request.getParameter("amount"));
+                
+                String claimsID = jdbc.getClaimsID(userName);
+                
+                String[] separateClaims = claimsID.split("-");
+                
+                String nextID = calculateNextClaimID(separateClaims);
+                
+                jdbc.makeClaim(nextID, userName, description, amount);
+                
+                RequestDispatcher view = request.getRequestDispatcher("membersDashboard.jsp");
+                
+                view.forward(request, response);
             }
+    }
+    
+    private String calculateNextClaimID(String[] claimArray) {
+        String nextClaimID = "";
+        
+        int greatestValue = 0;
+        int currentValue = 0;
+        
+        for(int i = 0; i < claimArray.length; i++) {
+            currentValue = Integer.parseInt(claimArray[i]);
+            
+            if(currentValue > greatestValue) {
+                greatestValue = currentValue;
+            }
+        }
+        
+        nextClaimID = Integer.toString(greatestValue + 1);
+        
+        return nextClaimID;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

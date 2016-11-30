@@ -20,15 +20,11 @@
         <div class="container">
             <form action="SubmitClaim">
                 <p>
-                <label><b>Date</b></label>
-                <input type="text" placeholder="DD/MM/YYYY" name="date" required>
-                </p>
-                <p>
                 <label><b>Description</b></label>
                 <input type="text" placeholder="Description" name="description" required>
                 </p>
                 <p>
-                <label><b>Amount</b></label>
+                <label><b>Amount(£)</b></label>
                 <input type="text" placeholder="Amount" name="amount" required>
                 </p>
                 <p>

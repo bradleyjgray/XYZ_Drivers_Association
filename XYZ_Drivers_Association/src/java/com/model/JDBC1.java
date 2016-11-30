@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -108,20 +109,19 @@ public class JDBC1 {
     
     public int claimCounter(String userID) {
         int count = 0;
-        
+
         select("SELECT * FROM Claims WHERE mem_id='" + userID + "'");
-        
-        
-        if (result != null) {  
+
+        if (result != null) {
             try {
                 result.beforeFirst();
-                result.last();  
+                result.last();
                 count = result.getRow();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }  
-        
+        }
+
         return count;
     }
 
@@ -351,7 +351,7 @@ public class JDBC1 {
             System.out.println("USER SUSPENDED!");
         } catch (SQLException e) {
             System.out.println("FAILED TO SUSPEND USER");
-            return "MEMBERSHIP SUSPEND FAILED!";
+            return " :: MEMBERSHIP SUSPEND FAILED!";
         }
         return " SUSPENDED";
     }
@@ -363,14 +363,14 @@ public class JDBC1 {
 
         try {
             pStatement = connection.prepareStatement("UPDATE users SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(1, "MEMBER");
+            pStatement.setString(1, "APPROVED");
             pStatement.setString(2, id_user);
             pStatement.executeUpdate();
 
             pStatement.close();
 
             pStatement = connection.prepareStatement("UPDATE Members SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(1, "MEMBER");
+            pStatement.setString(1, "APPROVED");
             pStatement.setString(2, id_user);
             pStatement.executeUpdate();
 
@@ -382,7 +382,7 @@ public class JDBC1 {
             return "MEMBERSHIP UPGRADE FAILED!";
         }
 
-        return " IS NOW A MEMBER.";
+        return " IS NOW AN APPROVED MEMBER.";
     }
 
     public void makePayment(String memId, float amount, String payType) {
@@ -416,6 +416,24 @@ public class JDBC1 {
         }
     }
 
+    public int yearlyClaimCount(String memId) {
+        int count = 0;
+
+        select("SELECT * FROM Claims WHERE mem_id='" + memId + "'");
+
+        if (result != null) {
+            try {
+                result.beforeFirst();
+                result.last();
+                count = result.getRow();
+            } catch (SQLException ex) {
+                Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        return count;
+    }
+
     public int claimCount(String memId) {
 
         //select from DB
@@ -444,8 +462,8 @@ public class JDBC1 {
 
         try {
             while (result.next()) {
-                String memberId = result.getString("memID");
-                Date claimDate = result.getDate("date");
+                String memberId = result.getString("mem_ID");
+                Date claimDate = (Date) result.getDate("date");
                 String status = result.getString("status");
                 //check if date is after 12 months ago and before today
                 if (claimDate.after(calendar.getTime()) && claimDate.before(today)) {
@@ -470,20 +488,20 @@ public class JDBC1 {
 
         String query = "SELECT * from Claims where id='" + claimId + "'";
         String mem_id = null;
+        String claimStatus = null;
 
         select(query);
 
         while (result.next()) {
             mem_id = result.getString("mem_id");
+            claimStatus = result.getString("status");
             break;
         }
 
-        if (claimCount(mem_id) > 2) {
-            return "REJECTED:: Two claims already made this year!";
-        }
+        if (!claimStatus.equals(response)) {
 
-        if (response != null) {
-            if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
+            if (response.equals("ACCEPTED") && claimCount(mem_id) >= 2) {
+                response = "REJECTED";
                 try {
                     pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
                     pStatement.setString(1, response);
@@ -495,40 +513,84 @@ public class JDBC1 {
                 } catch (SQLException ex) {
                     Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                return "CLAIM REJECTED:: USER ALREADY HAS 2 ACCEPTED CLAIMS IN THE LAST 12 MONTHS!";
+            }
+
+            if (response != null) {
+                if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
+                    try {
+                        pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                        pStatement.setString(1, response);
+                        pStatement.setString(2, claimId);
+                        pStatement.executeUpdate();
+
+                        pStatement.close();
+                        System.out.println("1 line updated.");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    return "CLAIM NOT AVAILABLE:: Please check claim number!";
+                }
             } else {
-                return "CLAIM NOT AVAILABLE:: Please check claim number!";
+                System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
             }
         } else {
-            System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
+            return " RESPONSE IDENTICAL TO ENTRY :: NO CHANGE!";
         }
-        return response;
+        return "CLAIM " + response;
+    }
+    
+    public String getClaimsID(String id) {
+        String claims = "";
+        
+        String query = "SELECT id from Claims WHERE mem_id='" + id + "'";
+        
+        select(query);
+        
+        try {
+            while (result.next()) {
+                String claimsID = (String)result.getString("id");
+                
+                claims = claims + claimsID + "-";
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return claims;
     }
 
-    public void makeClaim(String memId, String rationale, float amount) {
+    public void makeClaim(String id, String memId, String rationale, float amount) {
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date today = new Date();
 
-        String claimDate = null;
         String status = "PENDING";
-
+        
         PreparedStatement pStatement = null;
 
+        String dateClaim;
+        
         try {
-            claimDate = dateFormat.format(today);
-            today = dateFormat.parse(claimDate);
+            dateClaim = dateFormat.format(today);
+            today = dateFormat.parse(dateClaim);
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        java.sql.Date sqlDOC = new java.sql.Date(today.getTime());
 
         try {
-            pStatement = connection.prepareStatement("INSERT INTO Claims VALUES (?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(1, memId);
-            pStatement.setDate(2, (java.sql.Date) today);
-            pStatement.setString(3, rationale);
-            pStatement.setString(4, status);
-            pStatement.setFloat(5, amount);
-
+            pStatement = connection.prepareStatement("INSERT INTO Claims (id,mem_id,date,rationale,status,amount) VALUES (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setString(1, id);
+            pStatement.setString(2, memId);
+            pStatement.setDate(3, (java.sql.Date) sqlDOC);
+            pStatement.setString(4, rationale);
+            pStatement.setString(5, status);
+            pStatement.setFloat(6, amount);
+            pStatement.executeUpdate();
+            
             pStatement.close();
             System.out.println("1 line added.");
         } catch (SQLException ex) {
@@ -546,12 +608,13 @@ public class JDBC1 {
 //
 //        return memberClaims;
 //    }
-    public float calcMembershipFee() {
+    public String calcMembershipFee() {
 
         String query = "SELECT * from Claims";
-        String memQuery = "Select * from Members";
+        String memQuery = "Select * from Members where status='APPROVED'";
+        String paymentQuery = "Select * from payments";
 
-        float amount = 0.0f;
+        float amount = 0.0f, income = 0.0f;
         int memberCount = 0;
 
         select(query);
@@ -576,7 +639,7 @@ public class JDBC1 {
 
         try {
             while (result.next()) {
-                Date date = result.getDate("date");
+                Date date = (Date) result.getDate("date");
                 if (date.after(calendar.getTime()) && date.before(today)) {
                     amount += result.getFloat("amount");
                 }
@@ -589,15 +652,63 @@ public class JDBC1 {
 
         try {
             while (result.next()) {
-                memberCount++;
+                String status = result.getString("status");
+                if (status.equals("APPROVED")) {
+                    memberCount++;
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        select(paymentQuery);
+
+        try {
+            while (result.next()) {
+                Date date = (Date) result.getDate("date");
+                if (date.after(calendar.getTime()) && date.before(today)) {
+                    income += result.getFloat("amount");
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         membershipFee = (amount / memberCount);
+        
+        if (memberCount > 1){
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        membershipFee = Float.valueOf(df.format(membershipFee));
+        }
 
-        return membershipFee;
+        return String.valueOf(amount) + "," + String.valueOf(memberCount)
+                + "," + String.valueOf(membershipFee) + "," + String.valueOf(income);
+    }
+
+    public String chargeMembers() throws SQLException {
+
+        String query = "Select * from Members";
+
+        select(query);
+
+        while (result.next()) {
+            try {
+                float balance = result.getFloat("balance");
+                String id = result.getString("id");
+                PreparedStatement ps = null;
+
+                ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                ps.setFloat(1, balance + membershipFee);
+                ps.setString(2, id);
+                ps.executeUpdate();
+
+                ps.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return " BALANCE UPDATE SUCCESS :: " + membershipFee + " ADDED TO ALL BALANCES!";
     }
 
     public String authLogin(String user, String pass) {
