@@ -24,6 +24,13 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author Luke James
  */
+
+        /**
+     * FILTER: REQUEST LOG FILTER
+     * ROLE: LOGS ALL REQUEST TO SERVER LOGS FOR DEBUGGING AND SECURITY
+     * INCLUDES: LOGS ALL REQUESTS INC. PARAMETERS
+     * 
+    */
 public class RequestLogFilter implements Filter {
 
     private static final boolean debug = true;

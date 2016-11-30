@@ -46,6 +46,14 @@ public class AuthenticationFilter implements Filter {
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    
+        /**
+     * FILTER: AUTHENTICATION FILTER
+     * ROLE: ENSURE USERS MUST BE LOGGED IN TO ACCESS BEYOND LOGIN/REGISTRATION PAGES
+     * INCLUDES: CHECKS A SESSION IS ALIVE AND THE RESOURCES REQUESTED MATCH THOSE THAT ARE ALLOWED 
+     * IF NO SESSION IS AVAILABLE
+     * 
+    */
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {

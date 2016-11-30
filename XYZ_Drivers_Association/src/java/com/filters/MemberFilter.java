@@ -46,6 +46,13 @@ public class MemberFilter implements Filter {
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    
+            /**
+     * FILTER: MEMBER
+     * ROLE: ENSURE THAT MEMBERS/ADMINS CAN ONLY ACCESS RESPECTIVE DASHBOARDS
+     * INCLUDES: CHECKS USER AUTHKEY & RESOURCES REQUESTED AND HANDLES AS APPROPRIATE
+     * 
+    */
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
