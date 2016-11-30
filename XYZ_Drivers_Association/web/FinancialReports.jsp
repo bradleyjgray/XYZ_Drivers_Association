@@ -38,7 +38,7 @@
         out.print("Total Income (Previous 12 Months)</td><td> £" + incomeTotal + "</td>");
         out.print("</tr>");
         out.print("<tr>");
-        out.print("<td>Number of Members (Count to Date):</td><td> " + noOfMembers + "</td>");
+        out.print("<td>Number of Members (to Date):</td><td> " + noOfMembers + "</td>");
         out.print("</tr>");
         out.print("<tr>");
         out.print("<td> Claims Total (Last 12 Months):</td><td> £" + claimTotal + "</td>");
@@ -68,7 +68,7 @@
     </form>
 
     <br/><br/>
-    <form action="AdminDashboard.html">
+<form action="AdminDashboard.html">
           <button action="AdminDashboard.html" type="submit" value="listMembers"> Dashboard Menu </button>
     </form>
 </center>

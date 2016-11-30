@@ -610,7 +610,7 @@ public class JDBC1 {
 //    }
     public String calcMembershipFee() {
 
-        String query = "SELECT * from Claims";
+        String query = "SELECT * from Claims where status='ACCEPTED'";
         String memQuery = "Select * from Members where status='APPROVED'";
         String paymentQuery = "Select * from payments";
 
