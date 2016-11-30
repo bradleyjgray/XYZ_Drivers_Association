@@ -38,21 +38,26 @@ public class ProcessPayment extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        //Create HTTP session
         HttpSession session = request.getSession();
             
+        //Create instance of JDBC
         JDBC1 jdbc = new JDBC1();
         
         String result = null;    
         String userName = null;
             
+        //Get cookies of current session
         Cookie[] cookies = request.getCookies();
             
+        //Find username in cookies and store in userName value, for use later
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("user")) {
                     userName = cookie.getValue();
             }
         }
             
+        //Try to connect to database, if connection cannot be made then throw exception
         try {
             jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
         } catch (SQLException ex) {
@@ -65,10 +70,12 @@ public class ProcessPayment extends HttpServlet {
         } 
         else 
         {
+            //Get amount of payment and store as float
             float amount = Float.parseFloat(request.getParameter("amount"));
             
             String paymentType = null;
             
+            //If the amount paid is £10, it is for membership fee. Otherwise the payment will be for outstanding balance
             if (amount == 10.00f){
             paymentType = "MEMBERSHIP";
             } else {
@@ -88,18 +95,19 @@ public class ProcessPayment extends HttpServlet {
 //               nextID = calculateNextPaymentID(separatePayments); 
 //            }
 //            
+            //Method inserts details of payment into payment table in the database
             jdbc.makePayment(userName, amount, paymentType);
             
             try {
+                //Balance gets updated for member, payment takes money off balance
                 result = jdbc.updateBalance(amount, userName);
             } catch (SQLException ex) {
                 Logger.getLogger(ProcessPayment.class.getName()).log(Level.SEVERE, null, ex);
             }
             
+            //Forward to membersDashboard
             RequestDispatcher view = request.getRequestDispatcher("membersDashboard.jsp");
-            
             request.setAttribute("result", result);
-                
             view.forward(request, response);
         }
     }

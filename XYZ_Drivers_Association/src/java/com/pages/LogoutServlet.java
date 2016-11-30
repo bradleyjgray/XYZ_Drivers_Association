@@ -33,23 +33,28 @@ public class LogoutServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
+        //Get cookies of current session
         Cookie[] cookies = request.getCookies();
         
+        //If there are cookies
         if (cookies != null) {
             for (Cookie cookie : cookies) {
+                //Get value for user
                 if (cookie.getName().equals("user")) {
                     String userName = cookie.getValue();
                 }
+                //Get value for session ID
                 if (cookie.getName().equals("JSESSIONID")) {
                     String sessionID = cookie.getValue();
                 }
             }
         }
-        //invalidate current session
+        //Invalidate current session
         HttpSession session = request.getSession(false);
         if (session!= null){
             request.getSession().invalidate();
         }
+        //Redirect to login page
         response.sendRedirect(request.getContextPath() + "/");
         return;
     }

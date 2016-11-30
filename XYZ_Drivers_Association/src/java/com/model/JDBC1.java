@@ -634,11 +634,14 @@ public class JDBC1 {
         //paytype: EITHER BALANCE (Balance) or MEMBERSHIP (Membership)
         PreparedStatement pStatement = null;
 
+        //Store today's date
         Date today = new Date();
+        //Create date format
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String datePayment = "";
 
+        //Convert today's date into correct date format
         try {
             datePayment = dateFormat.format(today);
             today = dateFormat.parse(datePayment);
@@ -646,20 +649,25 @@ public class JDBC1 {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        //Convert java time into sql time
         java.sql.Date sqlDOP = new java.sql.Date(today.getTime());
 
         try {
+            //Create prepared statement to insert information into the database
             pStatement = connection.prepareStatement("INSERT INTO payments (mem_id, type_of_payment, amount, date) VALUES (?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             pStatement.setString(1, memId);
             pStatement.setString(2, payType);
             pStatement.setFloat(3, amount);
             pStatement.setDate(4, (java.sql.Date) sqlDOP);
 
+            //Execute query
             pStatement.executeUpdate();
 
+            //End statement
             pStatement.close();
             System.out.println("1 line added.");
         } catch (SQLException ex) {
+            //If insert fails, throw an exception
             System.out.println("FAILED to INSERT PAYMENT!" + ex);
         }
     }
@@ -667,9 +675,11 @@ public class JDBC1 {
     public int yearlyClaimCount(String memId) {
         int count = 0;
 
+        //Query database to select information from claims using the user ID
         select("SELECT * FROM Claims WHERE mem_id='" + memId + "'");
-
+        //If result set contains data
         if (result != null) {
+            //Count each row to find how many claims have been submitted
             try {
                 result.beforeFirst();
                 result.last();
@@ -684,24 +694,25 @@ public class JDBC1 {
 
     public int claimCount(String memId) {
 
-        //select from DB
+        //Select from DB
         String query = "SELECT * from Claims where mem_id='" + memId + "'";
         select(query);
 
-        //format todays date
+        //Format todays date
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date today = new Date();
 
-        //get date one year ago
+        //Get date one year ago
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, -1);
 
-        //for date conversion/parsing
+        //For date conversion/parsing
         String todayDate = null;
 
         int claimCount = 0;
 
         try {
+            //Convert date into correct format
             todayDate = dateFormat.format(today);
             today = dateFormat.parse(todayDate);
         } catch (ParseException ex) {
@@ -709,13 +720,18 @@ public class JDBC1 {
         }
 
         try {
+            //While result has next value
             while (result.next()) {
+                //Get member ID
                 String memberId = result.getString("mem_ID");
+                //Get the date of the claim
                 Date claimDate = (Date) result.getDate("date");
+                //Get the status of the claim
                 String status = result.getString("status");
-                //check if date is after 12 months ago and before today
+                //Check if date is after 12 months ago and before today
                 if (claimDate.after(calendar.getTime()) && claimDate.before(today)) {
                     if (memId.equals(memberId)) {
+                        //If status of claim is accepted, claimCount is incremented
                         if (status.equals("ACCEPTED")) {
                             claimCount++;
                         }
@@ -723,6 +739,7 @@ public class JDBC1 {
                 }
             }
         } catch (SQLException ex) {
+            //If result set is empty throw an exception
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("RESULT SET EMPTY!");
         }
@@ -734,26 +751,33 @@ public class JDBC1 {
         //CLAIMS MADE SET AS 'PENDING' STATUS.
         PreparedStatement pStatement = null;
 
+        //Query to get information on a claim using claim ID
         String query = "SELECT * from Claims where id='" + claimId + "'";
         String mem_id = null;
         String claimStatus = null;
 
         select(query);
 
+        //While result has data
         while (result.next()) {
+            //Get member ID
             mem_id = result.getString("mem_id");
+            //Get claim status
             claimStatus = result.getString("status");
             break;
         }
 
         if (!claimStatus.equals(response)) {
-
+            //If claim is accepted, but member has two or more claims
             if (response.equals("ACCEPTED") && claimCount(mem_id) >= 2) {
+                //Third claim will be rejected
                 response = "REJECTED";
                 try {
+                    //Prepared statement to update the status of claims for member
                     pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
                     pStatement.setString(1, response);
                     pStatement.setString(2, claimId);
+                    //Execute update statement
                     pStatement.executeUpdate();
 
                     pStatement.close();
@@ -761,12 +785,15 @@ public class JDBC1 {
                 } catch (SQLException ex) {
                     Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                //Return message saying claim is rejected if user already has two accepted claims in the last 12 months
                 return "CLAIM REJECTED:: USER ALREADY HAS 2 ACCEPTED CLAIMS IN THE LAST 12 MONTHS!";
             }
 
             if (response != null) {
+                //Update claims table if status is accepted or rejected
                 if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
                     try {
+                        //Prepare statement to update claims for member
                         pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
                         pStatement.setString(1, response);
                         pStatement.setString(2, claimId);
@@ -792,12 +819,14 @@ public class JDBC1 {
     public String getClaimsID(String id) {
         String claims = "";
 
+        //Query to get IDs of claims
         String query = "SELECT id from Claims WHERE mem_id='" + id + "'";
 
         select(query);
 
         try {
             while (result.next()) {
+                //Get each ID and add to string with a -
                 String claimsID = (String) result.getString("id");
 
                 claims = claims + claimsID + "-";
@@ -815,27 +844,34 @@ public class JDBC1 {
 
     public String makeClaim(String memId, String rationale, float amount) throws SQLException {
 
+        //Query to get information for a certain member
         String query = "Select * from Members where id='" + memId + "'";
         String memStatus = null;
 
+        //Create date of claim
         Date doc = new Date();
         Calendar cal = new GregorianCalendar();
 
         select(query);
 
         while (result.next()) {
+            //Get status of member
             memStatus = result.getString("status");
+            //Set time
             cal.setTime(result.getDate("dor"));
         }
 
         cal.add(Calendar.MONTH, 6);
 
+        //If member is approved, a claim can be made
         if (memStatus.equals("APPROVED")) {
             if (doc.after(cal.getTime())) {
 
+                //Date will be formatted as yyyy-MM-dd
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date today = new Date();
 
+                //Set claim status to pending
                 String status = "PENDING";
 
                 PreparedStatement pStatement = null;
@@ -843,21 +879,25 @@ public class JDBC1 {
                 String dateClaim;
 
                 try {
+                    //Convert date to correct format
                     dateClaim = dateFormat.format(today);
                     today = dateFormat.parse(dateClaim);
                 } catch (ParseException ex) {
                     Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
+                //Convert dat from java time to sql time
                 java.sql.Date sqlDOC = new java.sql.Date(today.getTime());
 
                 try {
+                    //Prepare statement to insert claim into claim table
                     pStatement = connection.prepareStatement("INSERT INTO Claims (mem_id,date,rationale,status,amount) VALUES (?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
                     pStatement.setString(1, memId);
                     pStatement.setDate(2, (java.sql.Date) sqlDOC);
                     pStatement.setString(3, rationale);
                     pStatement.setString(4, status);
                     pStatement.setFloat(5, amount);
+                    //Execute insert query
                     pStatement.executeUpdate();
 
                     pStatement.close();
@@ -878,6 +918,7 @@ public class JDBC1 {
 
     public String calcMembershipFee() {
 
+        //Queries for getting information from claims, members and payments
         String query = "SELECT * from Claims where status='ACCEPTED'";
         String memQuery = "Select * from Members where status='APPROVED'";
         String paymentQuery = "Select * from payments";
@@ -887,18 +928,19 @@ public class JDBC1 {
 
         select(query);
 
-        //format todays date
+        //Format todays date
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date today = new Date();
 
-        //get date one year ago
+        //Get date one year ago
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, -1);
 
-        //for date conversion/parsing
+        //For date conversion/parsing
         String todayDate = null;
 
         try {
+            //Convert date to correct format
             todayDate = dateFormat.format(today);
             today = dateFormat.parse(todayDate);
         } catch (ParseException ex) {
@@ -906,9 +948,13 @@ public class JDBC1 {
         }
 
         try {
+            //While result has next value
             while (result.next()) {
+                //Get date
                 Date date = (Date) result.getDate("date");
+                //If date is a year ago and before todays date
                 if (date.after(calendar.getTime()) && date.before(today)) {
+                    //Increase amount
                     amount += result.getFloat("amount");
                 }
             }
@@ -919,8 +965,11 @@ public class JDBC1 {
         select(memQuery);
 
         try {
+            //While result has next value
             while (result.next()) {
+                //Get status from result set
                 String status = result.getString("status");
+                //If status is approved, increase memberCount
                 if (status.equals("APPROVED")) {
                     memberCount++;
                 }
@@ -942,6 +991,7 @@ public class JDBC1 {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        //Membership fee is the sum of all claims / the total number of members
         membershipFee = (amount / memberCount);
 
         if (memberCount > 1) {
@@ -950,22 +1000,29 @@ public class JDBC1 {
             membershipFee = Float.valueOf(df.format(membershipFee));
         }
 
+        //Return string of total amount, member count, membership fee and income
         return String.valueOf(amount) + "," + String.valueOf(memberCount)
                 + "," + String.valueOf(membershipFee) + "," + String.valueOf(income);
     }
 
     public String chargeMembers() throws SQLException {
 
+        //Query to select all information from Members table
         String query = "Select * from Members";
 
         select(query);
 
         while (result.next()) {
             try {
+                //Get members balance
                 float balance = result.getFloat("balance");
+                //Get members ID
                 String id = result.getString("id");
+                //Get members status
                 String memStatus = result.getString("status");
+                //If members status is approved
                 if (memStatus.equals("APPROVED")) {
+                    //Prepared stament to update the members balance with there anual fee
                     PreparedStatement ps = null;
 
                     ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
@@ -984,26 +1041,37 @@ public class JDBC1 {
 
     public String authLogin(String user, String pass) throws SQLException {
 
+        //Query to select information about user from users table
         String query = "select * from users where id='" + user + "'";
 
         String authKey = null;
 
         select(query);
 
+        //If result set contains no data
         if (!result.next()) {
+            //Authentication failed
             authKey = "failed";
             return authKey;
         } else {
             result.beforeFirst();
             try {
+                //While result set has data
                 while (result.next()) {
+                    //Get user password
                     String pswd = result.getString("password");
+                    //Get user status
                     String status = result.getString("status");
+                    //If password matches
                     if (pass.equals(pswd)) {
+                        //Authentication equals status
                         authKey = status;
-                        if (status.equals("ADMIN")) {
-
-                        } else {
+                        if(status.equals("ADMIN")) {
+                            //Do nothing if user is admin
+                        }
+                        else
+                        {
+                            //Check member fee if approved
                             checkMemberFee(user);
                         }
 
@@ -1024,7 +1092,8 @@ public class JDBC1 {
 
         String resultTbl = null;
         String query = null;
-
+        
+        //Build query based on what table you want to get information from
         if (where.equals("*")) {
             query = "SELECT * from " + lookUp;
         } else {
@@ -1032,6 +1101,7 @@ public class JDBC1 {
         }
         select(query);
         try {
+            //Store resultTable as a string
             resultTbl = resultTable(resultList());
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
@@ -1042,10 +1112,12 @@ public class JDBC1 {
     public boolean checkMemberFee(String memId) throws SQLException {
 
         int yearMember = 1;
+        //Query to get information on member using member ID
         String query = "SELECT * from Members where id='" + memId + "'";
         float balance = 0;
         String memStatus = null;
-
+        
+        //Get todays date
         Date today = new Date();
         Date dor = null;
         Calendar calToday = new GregorianCalendar();
@@ -1054,20 +1126,27 @@ public class JDBC1 {
         select(query);
 
         while (result.next()) {
+            //Get date of registration
             dor = result.getDate("dor");
+            //Get members current balance
             balance = result.getFloat("balance");
+            //Get members status
             memStatus = result.getString("status");
 
         }
 
+        //If members status is approved
         if (memStatus.equals("APPROVED")) {
             calToday.setTime(today);
             calDor.setTime(dor);
+            //If the difference between todays date and date of registration is greater than a year
             if ((calToday.get(Calendar.YEAR) - calDor.get(Calendar.YEAR) >= yearMember)
                     && (calToday.get(Calendar.MONTH) >= calDor.get(Calendar.MONTH))) {
+                //Increment yearMember
                 yearMember++;
                 PreparedStatement ps = null;
-
+                
+                //Prepare statement to update balance
                 ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
                 ps.setFloat(1, balance + 10.00f);
                 ps.setString(2, memId);

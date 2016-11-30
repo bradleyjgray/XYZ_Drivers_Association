@@ -37,10 +37,13 @@ public class RegisterServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+            //Create HTTP session
             HttpSession session = request.getSession();
             
+            //Create iinstance of JDBC
             JDBC1 jdbc = new JDBC1();
             
+            //Try to connect to database, if connection cannot be made then throw exception
             try {
                 jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
             } catch (SQLException ex) {
@@ -53,25 +56,30 @@ public class RegisterServlet extends HttpServlet {
             } 
             else 
             {
+                //Get values for name, address and D.O.B
                 String name = request.getParameter("name");
                 String addr = request.getParameter("addr");
                 String dob = request.getParameter("dob");
             
+                //Use name and D.O.B to genrate a username and password for the user
                 String nameResult = jdbc.genUsr(name);
                 String passResult = jdbc.genPass(dob);
             
                 try {
+                    //Create a member and insert into member table in the database
                     jdbc.createMember(nameResult, name, addr, dob, "APPLIED");
+                    //Add user to user table
                     jdbc.addUsr(nameResult, passResult);
                 } catch (SQLException ex) {
                     Logger.getLogger(RegisterServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
             
+                //Set attributes for username and password so they can be displayed to the user in a jsp
                 request.setAttribute("genName", nameResult);
                 request.setAttribute("genPass", passResult);
             
+                //Forward to RegistrationSuccess
                 RequestDispatcher view = request.getRequestDispatcher("RegistrationSuccess.jsp");
-            
                 view.forward(request, response);
             }
     }

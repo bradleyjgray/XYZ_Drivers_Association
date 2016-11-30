@@ -38,24 +38,31 @@ public class StatusServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        //Create HTTP session
         HttpSession session = request.getSession();
         
+        //Create instance of JDBC
         JDBC1 jdbc = new JDBC1();
         
         RequestDispatcher view;
         
         String userName = null;
+        
+        //String to be used for querying the database
         String selectString = "name,status,balance";
         String claimString = "id,date,rationale,status,amount";
         
+        //Get cookies of current session
         Cookie[] cookies = request.getCookies();
             
+        //Find username in cookies and store in userName value, for use later
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("user")) {
                 userName = cookie.getValue();
             }
         }
         
+        //Try to connect to database, if connection cannot be made then throw exception
         try {
             jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
         } catch (SQLException ex) {
@@ -69,12 +76,13 @@ public class StatusServlet extends HttpServlet {
         else
         {
             
-            
+            //Get all claims from table and store in attribute, used to display claims 
             request.setAttribute("claims", jdbc.getClaimsForUser(userName, claimString));
+            //Get info on members to display later
             request.setAttribute("memberInfo", jdbc.getInfoForUser(userName, selectString));
             
+            //Forward to CheckStatus
             view = request.getRequestDispatcher("CheckStatus.jsp");
-            
             view.forward(request, response);
         }
     }
