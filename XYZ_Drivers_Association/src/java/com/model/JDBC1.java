@@ -72,23 +72,22 @@ public class JDBC1 {
             System.out.println("err" + e);
         }
     }
-    
+
     public int claimCounter(String userID) {
         int count = 0;
-        
+
         select("SELECT * FROM Claims WHERE mem_id='" + userID + "'");
-        
-        
-        if (result != null) {  
+
+        if (result != null) {
             try {
                 result.beforeFirst();
-                result.last();  
+                result.last();
                 count = result.getRow();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }  
-        
+        }
+
         return count;
     }
 
@@ -382,23 +381,22 @@ public class JDBC1 {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public int yearlyClaimCount(String memId){
+
+    public int yearlyClaimCount(String memId) {
         int count = 0;
-        
+
         select("SELECT * FROM Claims WHERE mem_id='" + memId + "'");
-        
-        
-        if (result != null) {  
+
+        if (result != null) {
             try {
                 result.beforeFirst();
-                result.last();  
+                result.last();
                 count = result.getRow();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }  
-        
+        }
+
         return count;
     }
 
@@ -465,27 +463,11 @@ public class JDBC1 {
             claimStatus = result.getString("status");
             break;
         }
-        
-        if (!claimStatus.equals(response)){
 
-        if (response.equals("ACCEPTED") && claimCount(mem_id) >= 2) {
-            response = "REJECTED";
-            try {
-                    pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
-                    pStatement.setString(1, response);
-                    pStatement.setString(2, claimId);
-                    pStatement.executeUpdate();
+        if (!claimStatus.equals(response)) {
 
-                    pStatement.close();
-                    System.out.println("1 line updated.");
-                } catch (SQLException ex) {
-                    Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            return "CLAIM REJECTED:: USER ALREADY HAS 2 ACCEPTED CLAIMS IN THE LAST 12 MONTHS!";
-        }
-
-        if (response != null) {
-            if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
+            if (response.equals("ACCEPTED") && claimCount(mem_id) >= 2) {
+                response = "REJECTED";
                 try {
                     pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
                     pStatement.setString(1, response);
@@ -497,14 +479,29 @@ public class JDBC1 {
                 } catch (SQLException ex) {
                     Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                return "CLAIM REJECTED:: USER ALREADY HAS 2 ACCEPTED CLAIMS IN THE LAST 12 MONTHS!";
+            }
+
+            if (response != null) {
+                if (response.equals("ACCEPTED") || response.equals("REJECTED")) {
+                    try {
+                        pStatement = connection.prepareStatement("UPDATE claims SET status=? WHERE id=?", PreparedStatement.RETURN_GENERATED_KEYS);
+                        pStatement.setString(1, response);
+                        pStatement.setString(2, claimId);
+                        pStatement.executeUpdate();
+
+                        pStatement.close();
+                        System.out.println("1 line updated.");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    return "CLAIM NOT AVAILABLE:: Please check claim number!";
+                }
             } else {
-                return "CLAIM NOT AVAILABLE:: Please check claim number!";
+                System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
             }
         } else {
-            System.out.println("Please enter valid claim response: ACCEPTED/REJECTED");
-        }
-        }
-        else {
             return " RESPONSE IDENTICAL TO ENTRY :: NO CHANGE!";
         }
         return "CLAIM " + response;
@@ -555,7 +552,7 @@ public class JDBC1 {
     public String calcMembershipFee() {
 
         String query = "SELECT * from Claims";
-        String memQuery = "Select * from Members";
+        String memQuery = "Select * from Members where status='APPROVED'";
         String paymentQuery = "Select * from payments";
 
         float amount = 0.0f, income = 0.0f;
@@ -596,18 +593,21 @@ public class JDBC1 {
 
         try {
             while (result.next()) {
-                memberCount++;
+                String status = result.getString("status");
+                if (status.equals("APPROVED")) {
+                    memberCount++;
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         select(paymentQuery);
-        
+
         try {
-            while (result.next()){
+            while (result.next()) {
                 Date date = (Date) result.getDate("date");
-                 if (date.after(calendar.getTime()) && date.before(today)) {
+                if (date.after(calendar.getTime()) && date.before(today)) {
                     income += result.getFloat("amount");
                 }
             }
@@ -617,31 +617,33 @@ public class JDBC1 {
 
         membershipFee = (amount / memberCount);
         
+        if (memberCount > 1){
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         membershipFee = Float.valueOf(df.format(membershipFee));
+        }
 
-        return String.valueOf(amount) + "," + String.valueOf(memberCount) + 
-                "," + String.valueOf(membershipFee) + "," + String.valueOf(income);
+        return String.valueOf(amount) + "," + String.valueOf(memberCount)
+                + "," + String.valueOf(membershipFee) + "," + String.valueOf(income);
     }
-    
-    public String chargeMembers() throws SQLException{
-        
+
+    public String chargeMembers() throws SQLException {
+
         String query = "Select * from Members";
-        
+
         select(query);
-        
-        while (result.next()){
+
+        while (result.next()) {
             try {
                 float balance = result.getFloat("balance");
                 String id = result.getString("id");
                 PreparedStatement ps = null;
-                
+
                 ps = connection.prepareStatement("UPDATE Members Set balance=? where id=?", PreparedStatement.RETURN_GENERATED_KEYS);
                 ps.setFloat(1, balance + membershipFee);
                 ps.setString(2, id);
                 ps.executeUpdate();
-                
+
                 ps.close();
             } catch (SQLException ex) {
                 Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
