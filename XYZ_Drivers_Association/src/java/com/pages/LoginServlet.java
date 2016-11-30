@@ -36,30 +36,40 @@ public class LoginServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    /**
+     * SERVLET: LOGIN SERVLET 
+     * ROLE: ORHCHESTRATE COMMUNICATION BETWEEN LOGIN/HOME
+     *      PAGE AND MODEL CLASS. 
+     * INCLUDES: CONNECTING TO DATABASE, AUTHENTICATING USER/PASSWORD, 
+     *      CREATING SESSIONS/COOKIES, FORWARDING RESULTS TO VIEW & ENABLING FILTERING THROUGH
+     *      PRESENCE OF HTTPSESSIONS.
+     *
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
 
         response.setContentType("text/html;charset=UTF-8");
 
+        //CREATE SESSION AND ESTABLISH CONNECTION TO DATABASE VIA LSITENER
         HttpSession session = request.getSession();
-
         JDBC1 jdbc = new JDBC1();
-
+        
         jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
         session.setAttribute("dbConn", jdbc);
-
+        //HANDLE DB CONNECTION ERR!
         if ((Connection) request.getServletContext().getAttribute("connection") == null) {
             request.getRequestDispatcher("/WEB-INF/conErr.jsp").forward(request, response);
         } else {
 
             String username = null, password = null;
-
+            //TAKE REQUEST PARAMETERS FROM FORM AND AUTHENTICATE THROUGH DB
             username = (String) request.getParameter("username");
             password = (String) request.getParameter("pswd");
-
+            //AUTHENTICATE USER & PASS & CHECK FOR YEARLY MEMBERSHIP PAYMENT
             String authKey = jdbc.authLogin(username, password);
-            
-            if (authKey.equals("APPLIED") || authKey.equals("APPROVED") || authKey.equals("ADMIN") 
+            //IF AUTHENTICATION IS SUCCESSFUL, CREATE SESSION TIMEOUT, ATTRIBUTES
+            //& COOKIES
+            if (authKey.equals("APPLIED") || authKey.equals("APPROVED") || authKey.equals("ADMIN")
                     || authKey.equals("SUSPENDED")) {
 
                 session.setAttribute(username, username);
@@ -70,9 +80,10 @@ public class LoginServlet extends HttpServlet {
                 user.setMaxAge(20 * 60);
                 response.addCookie(user);
                 response.sendRedirect("loginSuccess.jsp");
-                
+
             } else {
-               // request.getRequestDispatcher("/login.html").forward(request, response);
+                //IF AUTHENTICATION FAILS, RETURN TO LOGIN SCREEN AND THROW ERROR MSG
+                // request.getRequestDispatcher("/login.html").forward(request, response);
                 RequestDispatcher rd = getServletContext().getRequestDispatcher("/");
                 PrintWriter out = response.getWriter();
                 out.println("<font color=red>Either username or password is wrong.</font>");
