@@ -265,7 +265,7 @@ public class JDBC1 {
             pass = dob.replace("/", "-");
             String[] dateEdit = pass.split("-");
             String[] year = dateEdit[2].split("");
-            String newDate = dateEdit[0] + dateEdit[1] + year[2] + year[3];
+            String newDate = dateEdit[0] + dateEdit[1] + year[3] + year[4];
             pass = newDate;
         }
 
