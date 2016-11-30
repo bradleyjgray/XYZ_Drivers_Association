@@ -1,4 +1,3 @@
-
 package com.web;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,12 +16,12 @@ import javax.xml.transform.stream.*;
  * @author Marco Moreira
  */
 public class WeatherSOAP {
-    
-   public static String city;
-   public static String cloud;
-    
-    static public void weather(){
-            try {
+
+    public static String city;
+    public static String cloud;
+
+    static public void weather() {
+        try {
             // Create SOAP Connection
             SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
             SOAPConnection soapConnection = soapConnectionFactory.createConnection();
@@ -33,7 +32,7 @@ public class WeatherSOAP {
 
             // Process the SOAP Response
             printSOAP(soapResponse);
-            
+
             //Close the SOAP Connection
             soapConnection.close();
         } catch (Exception e) {
@@ -41,83 +40,58 @@ public class WeatherSOAP {
             e.printStackTrace();
         }
     }
-    
-        private static SOAPMessage createSOAP() throws Exception {
+
+    private static SOAPMessage createSOAP() throws Exception {
         MessageFactory message = MessageFactory.newInstance();
         SOAPMessage soapMessage = message.createMessage();
         return soapMessage;
     }
-        
+
     private static void printSOAP(SOAPMessage soapResponse) throws Exception {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         Source sourceContent = soapResponse.getSOAPPart().getContent();
-       // System.out.print("\nResponse SOAP Message = ");
+        // System.out.print("\nResponse SOAP Message = ");
         StreamResult result = new StreamResult(new File("c:\\weather.xml"));
         transformer.transform(sourceContent, result);
     }
-    
-    
-    static public void XMLread(){
-         try {
 
-	File fXmlFile = new File("c:\\weather.xml");
-	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-	Document doc = dBuilder.parse(fXmlFile);
+    static public void XMLread() {
+        try {
 
-	//optional, but recommended
-	//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-	doc.getDocumentElement().normalize();
+            File fXmlFile = new File("c:\\weather.xml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(fXmlFile);
+            doc.getDocumentElement().normalize();
 
-	NodeList cityList = doc.getElementsByTagName("city");
+            NodeList cityList = doc.getElementsByTagName("city");
+            NodeList cloudsList = doc.getElementsByTagName("clouds");
 
-	for (int temp1 = 0; temp1 < cityList.getLength(); temp1++) {
+            //for (int temp1 = 0; temp1 < cityList.getLength(); temp1++) {
+            Node nNode = cityList.item(0);
+            Node clNode = cloudsList.item(0);
 
-		Node cNode = cityList.item(temp1);
+            //System.out.println("\nCurrent Element :" + cNode.getNodeName());
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-		System.out.println("\nCurrent Element :" + cNode.getNodeName());
+                Element eElement = (Element) nNode;
+                city = (eElement.getAttribute("name"));
+                //System.out.println("City d : " + eElement.getAttribute("id") + eElement.getAttribute("name"));
+                //System.out.println(" : " + eElement.getElementsByTagName("firstname").item(0).getTextContent());
+                //System.out.println("Last Name : " + eElement.getElementsByTagName("lastname").item(0).getTextContent());
+                //System.out.println("Nick Name : " + eElement.getElementsByTagName("nickname").item(0).getTextContent());
+                //System.out.println("Salary : " + eElement.getElementsByTagName("salary").item(0).getTextContent());
 
-		if (cNode.getNodeType() == Node.ELEMENT_NODE) {
-
-			Element eElement = (Element) cNode;
-                        city = (eElement.getAttribute("id") + eElement.getAttribute("name"));
-			//System.out.println("City d : " + eElement.getAttribute("id") + eElement.getAttribute("name"));
-			//System.out.println(" : " + eElement.getElementsByTagName("firstname").item(0).getTextContent());
-			//System.out.println("Last Name : " + eElement.getElementsByTagName("lastname").item(0).getTextContent());
-			//System.out.println("Nick Name : " + eElement.getElementsByTagName("nickname").item(0).getTextContent());
-			//System.out.println("Salary : " + eElement.getElementsByTagName("salary").item(0).getTextContent());
-
-		}
-        
-        NodeList cloudList = doc.getElementsByTagName("cloud");
-        
-        for (int temp2 = 0; temp2 < cloudList.getLength(); temp2++) {
-
-		Node clNode = cityList.item(temp2);
-
-		System.out.println("\nCurrent Element :" + clNode.getNodeName());
-
-		if (clNode.getNodeType() == Node.ELEMENT_NODE) {
-
-			Element eElement = (Element) clNode;
-                        cloud = (eElement.getAttribute("id") + eElement.getAttribute("name"));
-			//System.out.println("City d : " + eElement.getAttribute("id") + eElement.getAttribute("name"));
-			//System.out.println(" : " + eElement.getElementsByTagName("firstname").item(0).getTextContent());
-			//System.out.println("Last Name : " + eElement.getElementsByTagName("lastname").item(0).getTextContent());
-			//System.out.println("Nick Name : " + eElement.getElementsByTagName("nickname").item(0).getTextContent());
-			//System.out.println("Salary : " + eElement.getElementsByTagName("salary").item(0).getTextContent());
-
-		}
-        
-	}
-       
-         }
-    } catch (Exception e) {
-	e.printStackTrace();
+                //}
+            }
+            if (clNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element cElement = (Element) clNode;
+                cloud = (cElement.getAttribute("name"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    }
-    
-    
-    
+
 }

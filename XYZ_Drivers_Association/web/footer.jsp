@@ -12,7 +12,8 @@
     com.web.WeatherSOAP weather = new com.web.WeatherSOAP();
     com.web.WeatherSOAP.weather();
     com.web.WeatherSOAP.XMLread();
-    out.print(com.web.WeatherSOAP.city);
+    String footerc = (com.web.WeatherSOAP.cloud);
 %>
 
 <p align="center"><font face="verdana"> Date: <%= date %> | Time: <%= time%> <%= zone %></font></p>
+<p align="center"><font face="verdana"> Current Weather: <%= footerc %>
