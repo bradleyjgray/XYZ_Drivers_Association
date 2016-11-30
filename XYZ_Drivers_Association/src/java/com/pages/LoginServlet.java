@@ -58,8 +58,9 @@ public class LoginServlet extends HttpServlet {
             password = (String) request.getParameter("pswd");
 
             String authKey = jdbc.authLogin(username, password);
+            
+            if (authKey.equals("APPLIED") || authKey.equals("APPROVED") || authKey.equals("ADMIN")) {
 
-            if (authKey.equals("APPLIED") || authKey.equals("MEMBER") || authKey.equals("ADMIN") || authKey.equals("APPROVED")) {
                 session.setAttribute(username, username);
                 session.setAttribute("authKey", authKey);
                 //set session to expire in 20 minutes
@@ -71,7 +72,7 @@ public class LoginServlet extends HttpServlet {
                 
             } else {
                // request.getRequestDispatcher("/login.html").forward(request, response);
-                RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
+                RequestDispatcher rd = getServletContext().getRequestDispatcher("/");
                 PrintWriter out = response.getWriter();
                 out.println("<font color=red>Either username or password is wrong.</font>");
                 rd.include(request, response);
