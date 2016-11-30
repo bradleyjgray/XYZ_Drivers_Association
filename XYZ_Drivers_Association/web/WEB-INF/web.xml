@@ -65,6 +65,10 @@
         <servlet-name>SubmitClaim</servlet-name>
         <servlet-class>com.pages.SubmitClaim</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProcessPayment</servlet-name>
+        <servlet-class>com.pages.ProcessPayment</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/doLogin</url-pattern>
@@ -96,6 +100,10 @@
     <servlet-mapping>
         <servlet-name>SubmitClaim</servlet-name>
         <url-pattern>/SubmitClaim</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProcessPayment</servlet-name>
+        <url-pattern>/ProcessPayment</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -24,7 +24,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author bgray
  */
-public class MembersServlet extends HttpServlet {
+public class ProcessPayment extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,40 +39,74 @@ public class MembersServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
-        
+            
         JDBC1 jdbc = new JDBC1();
-        
-        String cmd = request.getParameter("request");
-        
-        RequestDispatcher view;
-        
+            
+        String userName = null;
+            
+        Cookie[] cookies = request.getCookies();
+            
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("user")) {
+                    userName = cookie.getValue();
+            }
+        }
+            
         try {
             jdbc.connect((Connection) request.getServletContext().getAttribute("connection"));
         } catch (SQLException ex) {
-            Logger.getLogger(MembersServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RegisterServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
         session.setAttribute("dbConn", jdbc);
-
+            
         if ((Connection) request.getServletContext().getAttribute("connection") == null) {
             request.getRequestDispatcher("/WEB-INF/conErr.jsp").forward(request, response);
         } 
-        else
+        else 
         {
-            switch(cmd) {
-                case "checkStatus":
-                    view = request.getRequestDispatcher("StatusServlet");
-                    view.forward(request, response);   
-                    break;
-                case "makeClaim":
-                    view = request.getRequestDispatcher("MakeClaim.jsp");
-                    view.forward(request, response); 
-                    break;
-                case "makePayment":
-                    view = request.getRequestDispatcher("PaymentForm.jsp");
-                    view.forward(request, response); 
-                    break;
+            float amount = Float.parseFloat(request.getParameter("amount"));
+            String paymentType = request.getParameter("paymentType");
+            
+            String paymentsID = jdbc.getPaymentID(userName);
+            
+            String[] separatePayments = paymentsID.split("-");
+            String nextID = "";
+            
+            if(separatePayments[0].equals("") || separatePayments[0].equals("0")) {
+                nextID = "1";
+            }
+            else
+            {
+               nextID = calculateNextPaymentID(separatePayments); 
+            }
+            
+            jdbc.makePayment(nextID, userName, amount, paymentType);
+            
+            jdbc.updateBalance(nextID, userName);
+            
+            RequestDispatcher view = request.getRequestDispatcher("membersDashboard.jsp");
+                
+            view.forward(request, response);
+        }
+    }
+    
+    private String calculateNextPaymentID(String[] paymentArray) {
+        String nextClaimID = "";
+        
+        int greatestValue = 0;
+        int currentValue = 0;
+        
+        for(int i = 0; i < paymentArray.length; i++) {
+            currentValue = Integer.parseInt(paymentArray[i]);
+            
+            if(currentValue > greatestValue) {
+                greatestValue = currentValue;
             }
         }
+        
+        nextClaimID = Integer.toString(greatestValue + 1);
+        
+        return nextClaimID;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

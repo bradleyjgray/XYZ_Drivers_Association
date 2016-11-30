@@ -384,16 +384,87 @@ public class JDBC1 {
 
         return " IS NOW AN APPROVED MEMBER.";
     }
+    
+    public String getPaymentID(String id) {
+        String payments = "";
+        
+        String query = "SELECT id from payments WHERE mem_id='" + id + "'";
+        
+        select(query);
+        
+        try {
+            while (result.next()) {
+                String paymentID = (String)result.getString("id");
+                
+                payments = payments + paymentID + "-";
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(result == null) {
+            payments = "1";
+        }
+        
+        return payments;
+    }
+    
+    public void updateBalance(String paymentID, String id) {
+        String paymentQuery = "SELECT amount FROM payments WHERE mem_id='" + id + "'";
+        String balanceQuery = "SELECT balance FROM Members WHERE mem_id='" + id + "'";
+        
+        select(paymentQuery);
+        
+        float paymentAmount = 0;
+        float balanceAmount = 0;
+        
+        try {
+            while (result.next()) {
+                paymentAmount = (float)result.getFloat("amount");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        select(balanceQuery);
+        
+        try {
+            while (result.next()) {
+                balanceAmount = (float)result.getFloat("amount");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        float remainingBalance = 0;
+        
+        if(paymentAmount > balanceAmount) {
+            remainingBalance = 0;
+        }
+        else
+        {
+            remainingBalance = balanceAmount - paymentAmount;
+        }
+        
+        String updateBalanceQuery = "UPDATE Members SET balance=" + remainingBalance + "WHERE id='" + id + "'";
+        
+        try {
+            statement = connection.createStatement();
+            statement.executeUpdate(updateBalanceQuery);
+        } catch (SQLException e) {
+            System.out.println("UPDATE FAILED: " + e);
+        }
+    }
 
-    public void makePayment(String memId, float amount, String payType) {
+    public void makePayment(String id, String memId, float amount, String payType) {
 
         //paytype: EITHER BALANCE (Balance) or MEMBERSHIP (Membership)
         PreparedStatement pStatement = null;
 
         Date today = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        String datePayment = null;
+        String datePayment = "";
 
         try {
             datePayment = dateFormat.format(today);
@@ -401,18 +472,22 @@ public class JDBC1 {
         } catch (ParseException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        java.sql.Date sqlDOP = new java.sql.Date(today.getTime());
 
         try {
-            pStatement = connection.prepareStatement("INSERT INTO payments VALUES (?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pStatement.setString(1, memId);
-            pStatement.setString(2, payType);
-            pStatement.setFloat(3, amount);
-            pStatement.setDate(4, (java.sql.Date) today);
-
+            pStatement = connection.prepareStatement("insert into payments (amount, date, id, mem_id, type_of_payment) values (?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pStatement.setFloat(1, amount);
+            pStatement.setDate(2, (java.sql.Date) sqlDOP);
+            pStatement.setString(3, id);
+            pStatement.setString(4, memId);
+            pStatement.setString(5, payType);
+            pStatement.executeUpdate();
+            
             pStatement.close();
             System.out.println("1 line added.");
         } catch (SQLException ex) {
-            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("FAILED to INSERT PAYMENT!" + ex);
         }
     }
 
@@ -556,6 +631,10 @@ public class JDBC1 {
             }
         } catch (SQLException ex) {
             Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(result == null) {
+            claims = "1";
         }
         
         return claims;

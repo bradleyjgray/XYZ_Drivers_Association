@@ -70,8 +70,15 @@ public class SubmitClaim extends HttpServlet {
                 String claimsID = jdbc.getClaimsID(userName);
                 
                 String[] separateClaims = claimsID.split("-");
+                String nextID = "";
                 
-                String nextID = calculateNextClaimID(separateClaims);
+                if(separateClaims[0].equals("") || separateClaims[0].equals("0")) {
+                    nextID = "1";
+                }
+                else
+                {
+                    nextID = calculateNextClaimID(separateClaims);
+                }
                 
                 jdbc.makeClaim(nextID, userName, description, amount);
                 
