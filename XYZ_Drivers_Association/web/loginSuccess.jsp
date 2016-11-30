@@ -32,7 +32,7 @@
                     }
                 }
             }
-            if (key.equals("APPLIED") || key.equals("MEMBER")){
+            if (key.equals("APPLIED") || key.equals("APPROVED")){
                 response.sendRedirect("membersDashboard.jsp");
             }
             else {

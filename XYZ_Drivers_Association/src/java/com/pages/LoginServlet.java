@@ -59,7 +59,7 @@ public class LoginServlet extends HttpServlet {
 
             String authKey = jdbc.authLogin(username, password);
 
-            if (authKey.equals("APPLIED") || authKey.equals("MEMBER") || authKey.equals("ADMIN")) {
+            if (authKey.equals("APPLIED") || authKey.equals("APPROVED") || authKey.equals("ADMIN")) {
                 session.setAttribute(username, username);
                 session.setAttribute("authKey", authKey);
                 //set session to expire in 20 minutes
