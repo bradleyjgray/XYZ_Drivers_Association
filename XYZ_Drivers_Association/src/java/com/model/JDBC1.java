@@ -27,6 +27,13 @@ import java.util.Random;
  *
  * @author Luke James
  */
+/**
+ * CLASS: JDBC1 ROLE: TAKE IN PARAMETERS AND USE THEM TO RUN SQL QUERIES ON THE
+ * XYZ ASSOCIATION DATABASE AND RETURN RESULTS TO CONTROLLER. INCLUDES: ALL
+ * PROGRAM FUNCTIONALITY. LISTING, TABLES, CLAIMS, PAYMENTS, USER AUTHORISATION,
+ * RUN QUERIES ETC
+ *
+ */
 public class JDBC1 {
 
     Connection connection = null;
@@ -41,11 +48,19 @@ public class JDBC1 {
      * @param args the command line arguments
      * @throws java.sql.SQLException
      */
+    //CONNECTS TO DATABASE VIA LISTENER PARAMETER
     public void connect(Connection con) throws SQLException {
 
         connection = con;
     }
 
+    /**
+     *
+     * @param usr
+     * @return boolean
+     *
+     * METHOD RUNS SELECT QUERY ON DATABASE TO CHECK IF USER EXISTS.
+     */
     public boolean usrExists(String usr) {
         boolean bool = false;
 
@@ -64,6 +79,14 @@ public class JDBC1 {
         return bool;
     }
 
+    /**
+     *
+     * @param dbQuery
+     *
+     * METHOD USES dbQuery PARAM AS DB QUERY STRING. USES STATEMENT FUNCTION TO
+     * CREATE AND PUSH STATEMENT TO DATABASE TO RETRIEVE RESULTS WITHIN RESULT
+     * SET.
+     */
     private void select(String dbQuery) {
 
         try {
@@ -74,6 +97,12 @@ public class JDBC1 {
         }
     }
 
+    /**
+     *
+     * @param userID
+     * @param select
+     * @return MEMBERS LIST (HTML TABLE AS STRING) WHERE USED ID MATCHES PARAMETER
+     */
     public String getInfoForUser(String userID, String select) {
 
         String resultTbl = null;
@@ -90,7 +119,14 @@ public class JDBC1 {
         }
         return resultTbl;
     }
-
+    /**
+     * 
+     * @param userID
+     * @param select
+     * @return CLAIMS LIST (HTML TABLE AS STRING)
+     * 
+     * METHOD RUNS QUERY ON DATABASE AND RETURNS RESULT SET AS HTML TABLE (AS STRING)
+     */
     public String getClaimsForUser(String userID, String select) {
 
         String resultTbl = null;
@@ -108,6 +144,13 @@ public class JDBC1 {
         return resultTbl;
     }
 
+    /**
+     * 
+     * @param userID
+     * @return int (number of claims)
+     *  
+     * QUERY THE DATABASE AND USE RESULT SET TO COUNT NUMBER OF CLAIMS FOR A MEMBER
+     */
     public int claimCounter(String userID) {
         int count = 0;
 
@@ -126,6 +169,14 @@ public class JDBC1 {
         return count;
     }
 
+    /**
+     * 
+     * @return ARRYALIST (RESULT SET AS ARRAYLIST)
+     * @throws SQLException 
+     * 
+     * PREPARATION FOR HTML TABLE, USE THIS METHOD TO PUT DATA INTO 
+     * ROWS AND COLUMNS FOR TABLE
+     */
     private ArrayList resultList() throws SQLException {
         ArrayList resultList = new ArrayList<>();
 
@@ -143,6 +194,13 @@ public class JDBC1 {
         return resultList;
     }
 
+    /**
+     * 
+     * @param entries
+     * @return HTML TABLE AS STRING
+     * 
+     * METHOD RETURNS RESULT SET WITHIN ARRAYLIST AS HTML TABLE
+     */
     private String resultTable(ArrayList entries) {
         StringBuilder sb = new StringBuilder();
         String[] row;
@@ -166,6 +224,12 @@ public class JDBC1 {
         return sb.toString();
     }
 
+    /**
+     * 
+     * @param str 
+     * 
+     * METHOD INSERTS VALUES INTO DATABASE FROM STRING[]
+     */
     public void insert(String[] str) {
         PreparedStatement pStatement = null;
 
@@ -182,6 +246,14 @@ public class JDBC1 {
         }
     }
 
+    /**
+     * 
+     * @param name
+     * @param pass
+     * @return 
+     * 
+     * INSERT USER INTO DATABASE (W/ PASSWORD AND MEMBERSHIP STATUS)
+     */
     public boolean addUsr(String name, String pass) {
 
         PreparedStatement pStatement = null;
@@ -203,6 +275,12 @@ public class JDBC1 {
         return false;
     }
 
+    /**
+     * 
+     * @param str 
+     * 
+     * METHOD UPDATES PASSWORD FOR USER VIA PREPARED STATEMENT
+     */
     public void updatePwd(String[] str) {
         PreparedStatement pStatement = null;
 
@@ -219,6 +297,13 @@ public class JDBC1 {
         }
     }
 
+    /**
+     * 
+     * @param user 
+     * 
+     * DELETES USER FROM USERS TABLE -- FUNCTIONALITY NOT IN SCOPE 
+     * FOR CURRENT BUILD
+     */
     public void delete(String user) {
         String del = "DELETE FROM users WHERE username ='" + user.trim() + "'";
 
@@ -230,6 +315,9 @@ public class JDBC1 {
         }
     }
 
+    /**
+     * SECURITY :: CLOSE RESULT SET AND STATEMENT CONNECTIONS
+     */
     public void closeAll() {
         try {
             result.close();
@@ -239,6 +327,13 @@ public class JDBC1 {
         }
     }
 
+    /**
+     * 
+     * @param name
+     * @return USERNAME (STRING)
+     * 
+     * METHOD SPLICES NAME TO CREATE USERNAME FOR USER/MEMBER
+     */
     public String genUsr(String name) {
 
         String usrName = null;
@@ -258,6 +353,13 @@ public class JDBC1 {
         return usrName;
     }
 
+    /**
+     * 
+     * @param dob
+     * @return PASSWORD (STRING)
+     * 
+     * METHOD USES DATE OF BIRTH OF USER TO GENERATE PASSWORD (DDMMYY)
+     */
     public String genPass(String dob) {
         String pass = dob;
 
@@ -265,19 +367,39 @@ public class JDBC1 {
             pass = dob.replace("/", "-");
             String[] dateEdit = pass.split("-");
             String[] year = dateEdit[2].split("");
-            String newDate = dateEdit[0] + dateEdit[1] + year[2] + year[3];
+            String newDate = dateEdit[0] + dateEdit[1] + year[3] + year[4];
             pass = newDate;
         }
 
         return pass;
     }
 
+    /**
+     * 
+     * @param newFee
+     * @return MEMBERSHIPFEE
+     * 
+     * METHOD SETS NEW MEMBERSHIP FEE BASED ON INPUT VALUE
+     */
     public float setMemberFee(float newFee) {
         membershipFee = newFee;
 
         return membershipFee;
     }
 
+    /**
+     * 
+     * @param id
+     * @param name
+     * @param addr
+     * @param dob_String
+     * @param status
+     * @throws SQLException 
+     * 
+     * METHOD CREATES MEMBER IN MEMBERS TABLE WITH THE ABOVE PARAMETERS.
+     * METHOD MUST WORK OUT CURRENT DATE FOR DOR (DATE OF REGISTRATION)
+     * AND SET MEMBERS BALANCE AT 10 FOR THE JOINING FEE.
+     */
     public void createMember(String id, String name, String addr, String dob_String, String status) throws SQLException {
 
         PreparedStatement pStatement = null;
@@ -329,6 +451,16 @@ public class JDBC1 {
 
     }
 
+    /**
+     * 
+     * @param userId
+     * @return SUSPEND SUCCESS/FAILURE
+     * @throws SQLException 
+     * 
+     * METHOD WILL SUSPEND A USER UPON ADMINS REQUEST.  MEMBER SUSPENDED WILL 
+     * MATCH THE USER ID SELECTED WITHIN THE JSP VIEW.
+     * METHOD WILL UPDATE MEMBERS AND USERS TABLE
+     */
     public String suspendMember(String userId) throws SQLException {
 
         //String query = "SELECT * from Members where id='" + userId + "'";
@@ -357,6 +489,16 @@ public class JDBC1 {
         return " SUSPENDED";
     }
 
+    /**
+     * 
+     * @param id_user
+     * @return MEMBERSHIP UPDATE STATUS (STRING)
+     * @throws SQLException 
+     * 
+     * UPON REQUEST OF ADMIN, METHOD WILL UPDATE USERS AND MEMBERS TABLE FOR MEMBER
+     * TO SHOW UPDATED STATUS OF APPROVED ONCE INITIAL JOINING FEE HAS BEEN PAYED.
+     * 
+     */
     public String appliedToMember(String id_user) throws SQLException {
 
         String query = "SELECT * from users where id='" + id_user + "'";
@@ -386,6 +528,13 @@ public class JDBC1 {
         return " IS NOW AN APPROVED MEMBER.";
     }
 
+    /**
+     * 
+     * @param id
+     * @return 
+     * 
+     * METHOD DEPRECATED IN CURRENT SCOPE -- NO LONGER IN USE!!!
+     */
     public String getPaymentID(String id) {
         String payments = "";
 
@@ -410,6 +559,17 @@ public class JDBC1 {
         return payments;
     }
 
+    /**
+     * 
+     * @param paymentAmount
+     * @param id
+     * @return PAYMENT STATUS (STRING)
+     * @throws SQLException 
+     * 
+     * METHOD WILL QUERY THE DATABASE FOR CURRENT USER BALANCE THEN UPDATE (REDUCE) THE VALUE
+     * BY VALUE OF PAYMENT BEING MADE.  IF VALUE OF PAYMENT IS BIGGER THAN BALANCE,
+     * USER MUST SELECT A NEW PAYMENT AMOUNTS - MUST NOT ALLOW -VE BALANCE AMOUNTS!
+     */
     public String updateBalance(float paymentAmount, String id) throws SQLException {
         String paymentQuery = "SELECT amount FROM payments WHERE mem_id='" + id + "'";
         String balanceQuery = "SELECT balance FROM Members WHERE id='" + id + "'";
@@ -841,14 +1001,12 @@ public class JDBC1 {
                     String status = result.getString("status");
                     if (pass.equals(pswd)) {
                         authKey = status;
-                        if(status.equals("ADMIN")) {
-                            
-                        }
-                        else
-                        {
+                        if (status.equals("ADMIN")) {
+
+                        } else {
                             checkMemberFee(user);
                         }
-                        
+
                     } else {
                         authKey = "failed";
                     }
