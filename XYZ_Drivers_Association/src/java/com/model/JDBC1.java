@@ -616,11 +616,11 @@ public class JDBC1 {
         }
 
         membershipFee = (amount / memberCount);
-        
-        if (memberCount > 1){
-        DecimalFormat df = new DecimalFormat();
-        df.setMaximumFractionDigits(2);
-        membershipFee = Float.valueOf(df.format(membershipFee));
+
+        if (memberCount > 1) {
+            DecimalFormat df = new DecimalFormat();
+            df.setMaximumFractionDigits(2);
+            membershipFee = Float.valueOf(df.format(membershipFee));
         }
 
         return String.valueOf(amount) + "," + String.valueOf(memberCount)
@@ -652,7 +652,7 @@ public class JDBC1 {
         return " BALANCE UPDATE SUCCESS :: " + membershipFee + " ADDED TO ALL BALANCES!";
     }
 
-    public String authLogin(String user, String pass) {
+    public String authLogin(String user, String pass) throws SQLException {
 
         String query = "select * from users where id='" + user + "'";
 
@@ -660,22 +660,27 @@ public class JDBC1 {
 
         select(query);
 
-        try {
-            while (result.next()) {
-                String pswd = result.getString("password");
-                String status = result.getString("status");
-                if (pass.equals(pswd)) {
-                    authKey = status;
-                } else {
-                    authKey = "failed";
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
-            authKey = "failed!";
+        if (!result.next()) {
+            authKey = "failed";
             return authKey;
+        } else {
+            result.beforeFirst();
+            try {
+                while (result.next()) {
+                    String pswd = result.getString("password");
+                    String status = result.getString("status");
+                    if (pass.equals(pswd)) {
+                        authKey = status;
+                    } else {
+                        authKey = "failed";
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(JDBC1.class.getName()).log(Level.SEVERE, null, ex);
+                authKey = "failed!";
+                return authKey;
+            }
         }
-
         return authKey;
     }
 
