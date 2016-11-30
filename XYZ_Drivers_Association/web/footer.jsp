@@ -18,11 +18,10 @@
     String zone = zoneFormat.format(today);
     com.web.WeatherSOAP weather = new com.web.WeatherSOAP();
     com.web.WeatherSOAP.weather();
-    out.print(weather.testXML());
+    com.web.WeatherSOAP.XMLread();
+    String footerc = (com.web.WeatherSOAP.cloud);
+    int celsius = (com.web.WeatherSOAP.celsius);
 %>
 
-
-<p align="center"><font face="verdana"> Date: <%= date %> | Time: <%= time%> <%= zone %></font></p>
-<p align="center"><font face="verdana"> Testing XML String: <%= weather%>
-
-
+<p align="center"><font face="verdana"> Date: <%= date %> | Time: <%= time %> <%= zone %></font></p>
+<p align="center"><font face="verdana"> Current Weather: <%= celsius %>°C with <%= footerc %></font></p>
